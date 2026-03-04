@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { MapPin, Star, ArrowRight, CheckCircle, Clock } from 'lucide-react'
+import { MapPin, Star, ArrowRight, CheckCircle } from 'lucide-react'
 
 interface Props { params: { slug: string } }
 
