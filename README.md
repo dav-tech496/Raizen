@@ -1,59 +1,43 @@
-# Raizen
-🌍 Myanmar Travel Brain
+# 🇲🇲 Raizen — Myanmar Travel Brain
 
-AI-powered tourism planning platform for Myanmar.
+AI-powered travel planner for Myanmar, built with Next.js 14, Supabase, and Gemini AI.
 
-🚀 Vision
+## Stack
+- **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
+- **Database & Auth**: Supabase (PostgreSQL + Row Level Security)
+- **AI**: Google Gemini 1.5 Flash
+- **Deployment**: Vercel
 
-Myanmar Travel Brain helps users plan smart, safe, and budget-friendly trips across Myanmar using AI-powered itinerary generation and verified local listings.
+## Features
+- 🤖 AI Trip Planner (Gemini AI with MMK pricing)
+- 📍 Destination Pages (Bagan, Ngwe Saung, Inle Lake)
+- 🔐 Authentication (Login / Register)
+- 💾 Save Itineraries (authenticated users)
+- 🏨 Hotel Listings
+- 📱 Mobile-first responsive design
 
-✨ Features (MVP)
+## Setup
 
-🧠 AI Trip Planner (Gemini API)
+```bash
+npm install
+cp .env.example .env.local
+# Fill in your credentials
+npm run dev
+```
 
-📍 Destination pages (Bagan, Ngwesaung, Inle)
+## Environment Variables
 
-💾 Save itinerary (authenticated users)
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+GEMINI_API_KEY=
+```
 
-🏨 Hotel listings (manual for now)
+## Database Setup
 
-🔐 Supabase authentication
+Run `supabase/schema.sql` in your Supabase SQL Editor.
 
-🛠 Tech Stack
+## Deploy
 
-Next.js 14 (App Router)
-
-TypeScript
-
-Tailwind CSS
-
-Supabase (Database + Auth)
-
-Claude API
-
-Vercel Deployment
-
-🗂 Database Schema
-
-destinations
-hotels
-itineraries
-🌐 Deployment
-
-Connected to Vercel via GitHub.
-
-📌 Roadmap
-
- Add booking system
-
- Add verified badge system
-
- Add review system
-
- Add payment layer
-
- Expand to more cities
-
-👤 Founder
-
-Built by Min Thant Ko Ko
+Push to GitHub → Import in Vercel → Set environment variables → Deploy.
