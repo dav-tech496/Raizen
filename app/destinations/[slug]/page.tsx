@@ -3,13 +3,9 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Star, ArrowRight, CheckCircle } from 'lucide-react'
 
-interface Props { params: { slug: string } }
+export const dynamic = 'force-dynamic'
 
-export async function generateStaticParams() {
-  const supabase = createClient()
-  const { data } = await supabase.from('destinations').select('slug')
-  return (data ?? []).map((d) => ({ slug: d.slug }))
-}
+interface Props { params: { slug: string } }
 
 export default async function DestinationPage({ params }: Props) {
   const supabase = createClient()
@@ -30,7 +26,6 @@ export default async function DestinationPage({ params }: Props) {
 
   return (
     <div className="min-h-screen">
-      {/* Hero */}
       <div className="relative h-[65vh] overflow-hidden">
         {destination.image_url && (
           <img src={destination.image_url} alt={destination.name} className="w-full h-full object-cover" />
@@ -52,7 +47,6 @@ export default async function DestinationPage({ params }: Props) {
               <h2 className="text-2xl font-bold mb-4">About {destination.name}</h2>
               <p className="text-stone-300 text-lg leading-relaxed">{destination.description}</p>
             </div>
-
             {destination.highlights && destination.highlights.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4">Highlights</h2>
@@ -66,7 +60,6 @@ export default async function DestinationPage({ params }: Props) {
                 </div>
               </div>
             )}
-
             {hotels && hotels.length > 0 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4">Where to Stay</h2>
@@ -81,9 +74,7 @@ export default async function DestinationPage({ params }: Props) {
                               <span className="text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">✓ Verified</span>
                             )}
                           </div>
-                          {hotel.address && (
-                            <p className="text-stone-400 text-sm mb-3">{hotel.address}</p>
-                          )}
+                          {hotel.address && <p className="text-stone-400 text-sm mb-3">{hotel.address}</p>}
                           {hotel.amenities && (
                             <div className="flex flex-wrap gap-2">
                               {hotel.amenities.map((a: string) => (
@@ -108,8 +99,6 @@ export default async function DestinationPage({ params }: Props) {
               </div>
             )}
           </div>
-
-          {/* Sidebar */}
           <div>
             <div className="glass rounded-2xl p-6 sticky top-24">
               <h3 className="text-xl font-bold mb-4">Plan Your Trip</h3>
