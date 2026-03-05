@@ -7,8 +7,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
-        gold: { DEFAULT: '#D4AF37', light: '#F0D060' },
+        gold: { DEFAULT: '#f59e0b', light: '#fbbf24' },
+      },
+      backgroundImage: {
+        'gradient-gold': 'linear-gradient(135deg, #d97706, #f59e0b, #fbbf24)',
       },
     },
   },

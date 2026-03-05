@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { MapPin, ArrowRight } from 'lucide-react'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 export default async function DestinationsPage() {
   const supabase = createClient()
