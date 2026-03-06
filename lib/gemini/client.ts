@@ -1,22 +1,24 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { ItineraryAIResponse } from '@/types'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
-const SYSTEM_INSTRUCTION = `You are Raizen, an expert Myanmar travel planner with deep local knowledge.
-You MUST return ONLY valid JSON — no markdown, no explanation, no code fences, no extra text whatsoever.
-Always use Myanmar Kyat (MMK) for all pricing. 1 USD ≈ 2,100 MMK.
-Provide realistic, current pricing based on actual Myanmar costs.
-Be specific about real locations, restaurants, temples, and activities in Myanmar.`
-
 export async function generateItinerary(
   destination: string,
   days: number,
   budget: number
 ): Promise<ItineraryAIResponse> {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured')
+
+  const genAI = new GoogleGenerativeAI(apiKey)
+
+  const TRANSPORT_COST = 150000 // Fixed one-way trip cost for Ngwe Saung
+  const hotelBudget = Math.floor((budget - TRANSPORT_COST) * 0.60)
+  const foodBudget = Math.floor((budget - TRANSPORT_COST) * 0.20)
+  const activitiesBudget = Math.floor((budget - TRANSPORT_COST) * 0.15)
+  const miscBudget = budget - TRANSPORT_COST - hotelBudget - foodBudget - activitiesBudget
+
   const model = genAI.getGenerativeModel({
     model: 'gemini-1.5-flash',
-    systemInstruction: SYSTEM_INSTRUCTION,
     generationConfig: {
       responseMimeType: 'application/json',
       temperature: 0.7,
@@ -24,21 +26,28 @@ export async function generateItinerary(
     },
   })
 
-  const prompt = `Create a detailed ${days}-day travel itinerary for ${destination}, Myanmar.
-Total budget: ${budget.toLocaleString()} MMK
+  const prompt = `You are an expert Myanmar travel planner. Create a ${days}-day itinerary for ${destination}, Myanmar.
 
-Return a JSON object with EXACTLY this structure:
+IMPORTANT BUDGET RULES — use EXACTLY these numbers in your response:
+- transport: ${TRANSPORT_COST} (fixed one-trip bus/van cost, do NOT change this)
+- hotel: ${hotelBudget}
+- food: ${foodBudget}
+- activities: ${activitiesBudget}
+- misc: ${miscBudget}
+- total_estimated_budget: ${budget}
+
+Return ONLY a valid JSON object with NO markdown, NO code fences, NO extra text:
 {
   "destination": "${destination}",
   "total_days": ${days},
-  "total_estimated_budget": <number in MMK>,
+  "total_estimated_budget": ${budget},
   "currency": "MMK",
   "budget_breakdown": {
-    "transport": <number>,
-    "hotel": <number>,
-    "food": <number>,
-    "activities": <number>,
-    "misc": <number>
+    "transport": ${TRANSPORT_COST},
+    "hotel": ${hotelBudget},
+    "food": ${foodBudget},
+    "activities": ${activitiesBudget},
+    "misc": ${miscBudget}
   },
   "daily_plans": [
     {
@@ -47,13 +56,13 @@ Return a JSON object with EXACTLY this structure:
       "activities": [
         {
           "time": "08:00",
-          "activity": "<specific activity name>",
-          "location": "<real place name in ${destination}>",
+          "activity": "<specific activity>",
+          "location": "<real place in ${destination}>",
           "cost": <number in MMK>,
           "notes": "<practical local tip>"
         }
       ],
-      "estimated_cost": <total MMK for day>
+      "estimated_cost": <total MMK for this day>
     }
   ],
   "safety_tips": ["<tip1>", "<tip2>", "<tip3>"],
@@ -61,16 +70,26 @@ Return a JSON object with EXACTLY this structure:
   "local_tips": ["<tip1>", "<tip2>", "<tip3>"]
 }
 
-Include 4-6 activities per day. Make all details realistic and specific to Myanmar.`
+Include 4-6 activities per day. Use real place names in ${destination}. All costs in MMK.`
 
   const result = await model.generateContent(prompt)
   const text = result.response.text().trim()
-  const cleaned = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+
+  // Strip any accidental markdown fences
+  const cleaned = text
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim()
+
   const parsed: ItineraryAIResponse = JSON.parse(cleaned)
 
-  if (!parsed.destination || !parsed.daily_plans || !Array.isArray(parsed.daily_plans)) {
-    throw new Error('Invalid itinerary structure from AI')
+  if (!parsed.destination || !Array.isArray(parsed.daily_plans)) {
+    throw new Error('Invalid itinerary structure returned by AI')
   }
+
+  // Force the transport value to be exactly 150000 regardless of AI output
+  parsed.budget_breakdown.transport = TRANSPORT_COST
 
   return parsed
 }

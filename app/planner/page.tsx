@@ -199,18 +199,23 @@ function PlannerContent() {
           {/* Budget Breakdown Preview */}
           <div className="mt-8 p-4 bg-white/3 rounded-2xl border border-white/5">
             <div className="text-xs text-white/40 uppercase tracking-wider mb-3">Estimated Budget Split</div>
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { label: 'Hotel', pct: 55, color: 'bg-amber-400' },
-                { label: 'Food', pct: 20, color: 'bg-blue-400' },
-                { label: 'Transport', pct: 15, color: 'bg-green-400' },
-                { label: 'Activities', pct: 10, color: 'bg-purple-400' },
-              ].map(item => (
-                <div key={item.label} className="text-center">
-                  <div className="text-sm font-bold text-white">{Math.floor(budget * item.pct / 100).toLocaleString()}</div>
-                  <div className="text-xs text-white/40 mt-0.5">{item.label}</div>
-                </div>
-              ))}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {(() => {
+                const transport = 150000
+                const remaining = budget - transport
+                return [
+                  { label: 'Hotel', amount: Math.floor(remaining * 0.60) },
+                  { label: 'Food', amount: Math.floor(remaining * 0.20) },
+                  { label: 'Transport', amount: transport },
+                  { label: 'Activities', amount: Math.floor(remaining * 0.15) },
+                ].map(item => (
+                  <div key={item.label} className="text-center bg-white/3 rounded-xl p-3">
+                    <div className="text-sm font-bold text-amber-400">{item.amount.toLocaleString()}</div>
+                    <div className="text-xs text-white/40 mt-0.5">{item.label}</div>
+                    {item.label === 'Transport' && <div className="text-xs text-white/20 mt-0.5">fixed</div>}
+                  </div>
+                ))
+              })()}
             </div>
           </div>
 
@@ -228,32 +233,66 @@ function PlannerContent() {
           <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-center mb-6">{error}</div>
         )}
 
-        {/* Affordable Hotels */}
+{/* Affordable Hotels */}
         {affordableHotels.length > 0 && (
-          <div className="glass-card rounded-3xl p-8 mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Hotel className="w-6 h-6 text-amber-400" />
+          <div className="glass-card rounded-3xl p-6 md:p-8 mb-8">
+            <div className="flex items-start gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-amber-400/10 flex items-center justify-center flex-shrink-0">
+                <Hotel className="w-5 h-5 text-amber-400" />
+              </div>
               <div>
                 <h3 className="text-xl font-bold">Hotels Within Your Budget</h3>
-                <p className="text-white/40 text-sm">{affordableHotels.length} options available · Based on {Math.floor(budget * 0.55 / days).toLocaleString()} MMK/night hotel budget</p>
+                <p className="text-white/40 text-sm mt-0.5">
+                  {affordableHotels.length} room{affordableHotels.length !== 1 ? 's' : ''} available &middot; Up to {Math.floor(budget * 0.55 / days).toLocaleString()} MMK/night
+                </p>
               </div>
             </div>
-            <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
-              {affordableHotels.map((h, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-white/3 rounded-xl border border-white/5 hover:border-amber-400/20 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <div>
-                      <div className="font-semibold text-sm">{h.hotel}</div>
-                      <div className="text-white/40 text-xs">{h.room}</div>
+
+            {/* Group by hotel */}
+            <div className="space-y-4">
+              {HOTELS.map(hotel => {
+                const hotelRooms = affordableHotels.filter(h => h.hotel === hotel.name)
+                if (hotelRooms.length === 0) return null
+                const categoryColors: Record<string, string> = {
+                  Luxury: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+                  Premium: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+                  'Mid-Range': 'text-green-400 bg-green-400/10 border-green-400/20',
+                  Boutique: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+                  Villa: 'text-rose-400 bg-rose-400/10 border-rose-400/20',
+                }
+                const catStyle = categoryColors[hotel.category] ?? 'text-white/60 bg-white/5 border-white/10'
+                return (
+                  <div key={hotel.name} className="border border-white/8 rounded-2xl overflow-hidden">
+                    {/* Hotel header */}
+                    <div className="flex items-center justify-between px-5 py-3 bg-white/3 border-b border-white/5">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-sm text-white">{hotel.name}</span>
+                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catStyle}`}>
+                          {hotel.category}
+                        </span>
+                      </div>
+                      <span className="text-white/30 text-xs">{hotelRooms.length} room{hotelRooms.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    {/* Room rows */}
+                    <div className="divide-y divide-white/5">
+                      {hotelRooms.map((h, i) => (
+                        <div key={i} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-5 py-3 hover:bg-white/3 transition-colors">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <CheckCircle className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+                            <span className="text-sm text-white/80 truncate">{h.room}</span>
+                          </div>
+                          <div className="flex items-center gap-4 flex-shrink-0 pl-5 sm:pl-0">
+                            <div className="text-right">
+                              <div className="text-amber-400 font-bold text-sm">{h.pricePerNight.toLocaleString()} <span className="text-white/30 font-normal text-xs">MMK/night</span></div>
+                              <div className="text-white/30 text-xs">{h.totalHotelCost.toLocaleString()} MMK total</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <div className="text-right ml-4">
-                    <div className="text-amber-400 font-bold text-sm">{h.pricePerNight.toLocaleString()}/night</div>
-                    <div className="text-white/40 text-xs">{h.totalHotelCost.toLocaleString()} total</div>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}

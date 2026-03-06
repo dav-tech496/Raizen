@@ -5,7 +5,7 @@ import { generateItinerary } from '@/lib/gemini/client'
 const RequestSchema = z.object({
   destination: z.string().min(2).max(100),
   days: z.number().int().min(1).max(30),
-  budget: z.number().int().min(10000).max(100000000),
+  budget: z.number().int().min(200000).max(100000000),
 })
 
 export async function POST(request: NextRequest) {
@@ -15,27 +15,22 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid request', details: validation.error.flatten() },
+        { error: 'Invalid request parameters', details: validation.error.flatten() },
         { status: 400 }
       )
     }
 
     const { destination, days, budget } = validation.data
     const itinerary = await generateItinerary(destination, days, budget)
-
     return NextResponse.json({ itinerary }, { status: 200 })
+
   } catch (error) {
-    console.error('[generate-itinerary]', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[generate-itinerary] Error:', message)
 
-    if (error instanceof SyntaxError) {
-      return NextResponse.json(
-        { error: 'AI returned invalid format. Please try again.' },
-        { status: 502 }
-      )
-    }
-
+    // Surface the real error message for easier debugging
     return NextResponse.json(
-      { error: 'Failed to generate itinerary. Please try again.' },
+      { error: message || 'Failed to generate itinerary. Please try again.' },
       { status: 500 }
     )
   }
