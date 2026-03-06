@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { Sparkles, ArrowRight, MapPin, Star, Clock, Mail, Globe, Phone } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
+import { useLang } from '@/components/theme/LangProvider'
 
 const T = {
   en: {
@@ -21,8 +20,8 @@ const T = {
     plan_ai: 'Plan with AI',
     how_title: 'How it works',
     how_sub: 'Your perfect trip in 3 simple steps',
-    s1t: 'Pick a destination',   s1d: "Choose from Myanmar's best destinations",
-    s2t: 'Set days & budget',    s2d: 'Tell us how long and your budget in MMK',
+    s1t: 'Pick a destination',    s1d: "Choose from Myanmar's best destinations",
+    s2t: 'Set days & budget',     s2d: 'Tell us how long and your budget in MMK',
     s3t: 'Get your AI itinerary', s3d: 'Gemini AI crafts your perfect day-by-day plan',
     free: 'Free to use',
     nocard: 'No credit card',
@@ -51,9 +50,9 @@ const T = {
     plan_ai: 'AI ဖြင့် စီစဉ်',
     how_title: 'ဘယ်လိုအသုံးပြုမလဲ',
     how_sub: 'ရိုးရှင်းသော အဆင့် ၃ ဆင့်',
-    s1t: 'ခရီးစဉ်ရွေးပါ',      s1d: 'မြန်မာ၏ အကောင်းဆုံး နေရာများမှ ရွေးချယ်ပါ',
-    s2t: 'ရက်နှင့် ဘတ်ဂျက်',  s2d: 'ကြာချိန်နှင့် ဘတ်ဂျက် MMK ဖြင့် ထည့်သွင်းပါ',
-    s3t: 'AI အစီအစဉ် ရယူပါ',  s3d: 'Gemini AI မှ နေ့ဆင့် အစီအစဉ် ရေးဆွဲပေးသည်',
+    s1t: 'ခရီးစဉ်ရွေးပါ',       s1d: 'မြန်မာ၏ အကောင်းဆုံး နေရာများမှ ရွေးချယ်ပါ',
+    s2t: 'ရက်နှင့် ဘတ်ဂျက်',   s2d: 'ကြာချိန်နှင့် ဘတ်ဂျက် MMK ဖြင့် ထည့်သွင်းပါ',
+    s3t: 'AI အစီအစဉ် ရယူပါ',   s3d: 'Gemini AI မှ နေ့ဆင့် အစီအစဉ် ရေးဆွဲပေးသည်',
     free: 'အခမဲ့ အသုံးပြုနိုင်',
     nocard: 'ကတ်မလိုအပ်',
     mmk: 'MMK ဈေးနှုန်း',
@@ -63,62 +62,17 @@ const T = {
     footer_rights: 'မူပိုင်ခွင့် ရှိသည်။',
     f_home: 'မူလစာမျက်နှာ',
     f_dest: 'ခရီးစဉ်များ',
-    f_plan: 'ခရီးစီစဉ်ရန်',
+    f_plan: 'စီစဉ်ရန်',
     highlights: ['ကမ်းခြေ ၂၀ ကီလို', 'ချစ်သူ ကျွန်း', 'ပင်လယ်ဆိပ်', 'ရေကစားခြင်း', 'လူဇရီ ရစောတ်', 'မီးပုံပွဲ'],
   },
 }
 
 export default function HomePage() {
-  const [lang, setLang] = useState<'en' | 'mm'>('en')
+  const { lang } = useLang()
   const t = T[lang]
 
   return (
     <div className="min-h-screen bg-surface text-primary">
-
-      {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-card shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-primary">Raizen</span>
-          </Link>
-
-          {/* Right side — language toggle + theme toggle only */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Language toggle */}
-            <div className="flex items-center bg-surface-2 border border-theme rounded-full p-0.5">
-              <button
-                onClick={() => setLang('en')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'en' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}
-              >
-                EN
-              </button>
-              <button
-                onClick={() => setLang('mm')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'mm' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}
-              >
-                မြန်မာ
-              </button>
-            </div>
-
-            {/* Dark/light toggle */}
-            <ThemeToggle />
-
-            {/* Plan Trip CTA */}
-            <Link
-              href="/planner"
-              className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{lang === 'en' ? 'Plan Trip' : 'ခရီးစီစဉ်'}</span>
-            </Link>
-          </div>
-        </div>
-      </nav>
 
       {/* ── HERO ── */}
       <section className="pt-16 min-h-[90vh] flex items-center relative overflow-hidden">
@@ -246,7 +200,7 @@ export default function HomePage() {
           </div>
           <div className="text-center mt-10">
             <Link href="/planner"
-              className="inline-flex items-center gap-2 px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/40 hover:-translate-y-0.5">
+              className="inline-flex items-center gap-2 px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:-translate-y-0.5">
               <Sparkles className="w-5 h-5" />{t.hero_cta}
             </Link>
           </div>
@@ -255,21 +209,20 @@ export default function HomePage() {
 
       {/* ── FOOTER ── */}
       <footer className="bg-slate-900 dark:bg-slate-950 text-white">
-        {/* Top section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
           {/* Brand */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center">
-                <MapPin className="w-4.5 h-4.5 text-white" />
+                <MapPin className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold">Raizen</span>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
               {t.footer_tagline}
             </p>
-            <div className="flex items-center gap-2 pt-2">
+            <div className="flex items-center gap-2 pt-1">
               <span className="text-2xl">🇲🇲</span>
               <span className="text-slate-500 text-xs">Made for Myanmar travelers</span>
             </div>
@@ -277,9 +230,7 @@ export default function HomePage() {
 
           {/* Navigation */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">
-              {t.footer_nav}
-            </h4>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">{t.footer_nav}</h4>
             <ul className="space-y-2.5">
               {[
                 { label: t.f_home, href: '/' },
@@ -299,13 +250,11 @@ export default function HomePage() {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">
-              {t.footer_contact}
-            </h4>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">{t.footer_contact}</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm text-slate-400">
                 <Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <span>hello@raizenmyanmar.com</span>
+                <span>vibeauto3@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-400">
                 <Globe className="w-4 h-4 text-blue-400 flex-shrink-0" />
@@ -313,7 +262,7 @@ export default function HomePage() {
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-400">
                 <Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                <span>+95 9 123 456 789</span>
+                <span>09751067759</span>
               </li>
             </ul>
           </div>
