@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Sparkles, ArrowRight, MapPin, Star, Clock } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 const TRANSLATIONS = {
   en: {
@@ -59,54 +58,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-surface text-primary">
 
-      {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-primary">Raizen</span>
-          </Link>
-
-          {/* Center nav */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/destinations" className="text-sm font-medium text-secondary hover:text-primary transition-colors">
-              {t.nav_destinations}
-            </Link>
-            <Link href="/planner" className="text-sm font-medium text-secondary hover:text-primary transition-colors">
-              {t.nav_plan}
-            </Link>
-          </div>
-
-          {/* Right side */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Language toggle */}
-            <div className="flex items-center bg-surface-2 border border-theme rounded-full p-0.5">
-              <button onClick={() => setLang('en')}
-                className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'en' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}>
-                EN
-              </button>
-              <button onClick={() => setLang('mm')}
-                className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'mm' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}>
-                မြန်မာ
-              </button>
-            </div>
-
-            {/* Dark/light toggle */}
-            <ThemeToggle />
-
-            <Link href="/login" className="hidden sm:block text-sm font-medium text-secondary hover:text-primary transition-colors">
-              {t.nav_signin}
-            </Link>
-            <Link href="/planner" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t.nav_plan}</span>
-            </Link>
-          </div>
-        </div>
-      </nav>
 
       {/* HERO */}
       <section className="pt-16 min-h-[90vh] flex items-center relative overflow-hidden">
@@ -134,15 +85,12 @@ export default function HomePage() {
               {t.hero_sub}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 items-start">
               <Link href="/planner"
                 className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all text-base sm:text-lg hover:shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/40 hover:-translate-y-0.5">
                 <Sparkles className="w-5 h-5" />{t.hero_cta}
               </Link>
-              <Link href="/destinations"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-card hover:bg-surface-2 text-primary font-semibold rounded-xl border border-card transition-all text-base sm:text-lg hover:-translate-y-0.5">
-                {t.hero_cta2}<ArrowRight className="w-5 h-5" />
-              </Link>
+
             </div>
 
             <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-10 text-sm text-muted">

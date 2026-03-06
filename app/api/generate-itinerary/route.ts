@@ -28,9 +28,18 @@ export async function POST(request: NextRequest) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('[generate-itinerary] Error:', message)
 
-    // Surface the real error message for easier debugging
+    // Show friendly message for common errors
+    let userMessage = 'Failed to generate itinerary. Please try again.'
+    if (message.includes('429') || message.includes('quota') || message.includes('Too Many Requests')) {
+      userMessage = 'The AI service is temporarily over capacity. Please wait a few minutes and try again.'
+    } else if (message.includes('API_KEY') || message.includes('api key') || message.includes('not configured')) {
+      userMessage = 'AI service configuration error. Please contact support.'
+    } else if (message.includes('GEMINI_API_KEY')) {
+      userMessage = 'AI service is not configured correctly.'
+    }
+
     return NextResponse.json(
-      { error: message || 'Failed to generate itinerary. Please try again.' },
+      { error: userMessage },
       { status: 500 }
     )
   }

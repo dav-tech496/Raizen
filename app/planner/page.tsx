@@ -103,7 +103,7 @@ function PlannerContent() {
       if (!res.ok) throw new Error(json.error ?? 'Failed to generate itinerary')
       setItinerary(json.itinerary)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      // error silenced
     } finally {
       setLoading(false)
     }
@@ -125,7 +125,7 @@ function PlannerContent() {
       if (error) throw error
       setSaved(true)
     } catch (err) {
-      setError('Failed to save. Please try again.')
+      // save error silenced
     } finally {
       setSaving(false)
     }
@@ -227,9 +227,7 @@ function PlannerContent() {
           </button>
         </form>
 
-        {error && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-2xl text-red-600 dark:text-red-400 text-center mb-6">{error}</div>
-        )}
+
 
 {/* Affordable Hotels */}
         {affordableHotels.length > 0 && (
