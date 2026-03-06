@@ -5,19 +5,64 @@
 @layer base {
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
+
+  /* Light mode: warm cream */
+  :root {
+    --bg: #faf9f7;
+    --bg-2: #f3f1ee;
+    --bg-3: #eae7e2;
+    --border: #e2ded8;
+    --text: #1a1a1a;
+    --text-2: #4a4a4a;
+    --text-3: #888480;
+    --card: #ffffff;
+    --card-border: #e8e4df;
+  }
+
+  /* Dark mode: dark slate grey */
+  .dark {
+    --bg: #1e2330;
+    --bg-2: #252b3b;
+    --bg-3: #2c3347;
+    --border: #353d52;
+    --text: #f0ede8;
+    --text-2: #b0aaa2;
+    --text-3: #6e6a64;
+    --card: #252b3b;
+    --card-border: #353d52;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 }
 
 @layer utilities {
+  .bg-surface { background-color: var(--bg); }
+  .bg-surface-2 { background-color: var(--bg-2); }
+  .bg-surface-3 { background-color: var(--bg-3); }
+  .border-theme { border-color: var(--border); }
+  .text-primary { color: var(--text); }
+  .text-secondary { color: var(--text-2); }
+  .text-muted { color: var(--text-3); }
+  .bg-card { background-color: var(--card); }
+  .border-card { border-color: var(--card-border); }
+
   .glass {
     background: rgba(255,255,255,0.04);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255,255,255,0.08);
   }
+  .dark .glass {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
   .glass-card {
-    background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.07);
+    background-color: var(--card);
+    border: 1px solid var(--card-border);
   }
   .gradient-text {
     background: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
@@ -28,14 +73,18 @@
   .gradient-gold {
     background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
   }
-  .text-shadow-lg {
-    text-shadow: 0 4px 30px rgba(0,0,0,0.7);
-  }
-  .card-hover {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .card-hover:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background-color: var(--bg-3);
+    color: var(--text-2);
+    border: 1px solid var(--border);
   }
 }

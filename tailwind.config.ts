@@ -5,6 +5,7 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -12,9 +13,18 @@ const config: Config = {
       },
       colors: {
         gold: { DEFAULT: '#f59e0b', light: '#fbbf24' },
-      },
-      backgroundImage: {
-        'gradient-gold': 'linear-gradient(135deg, #d97706, #f59e0b, #fbbf24)',
+        // Light mode: warm cream
+        surface: {
+          light: '#faf9f7',
+          'light-2': '#f3f1ee',
+          'light-3': '#eae7e2',
+        },
+        // Dark mode: dark slate grey
+        slate: {
+          850: '#1e2330',
+          900: '#171c28',
+          950: '#111520',
+        },
       },
     },
   },

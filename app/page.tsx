@@ -3,14 +3,15 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Sparkles, ArrowRight, MapPin, Star, Clock } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 const TRANSLATIONS = {
   en: {
     nav_destinations: 'Destinations',
     nav_plan: 'Plan Trip',
     nav_signin: 'Sign In',
-    hero_headline_1: 'Plan Your',
-    hero_headline_2: 'Travel Journey',
+    hero_line1: 'Plan Your',
+    hero_line2: 'Travel Journey',
     hero_sub: "Start planning for free — it's simple",
     hero_cta: 'Start Planning',
     hero_cta2: 'View Destinations',
@@ -21,23 +22,18 @@ const TRANSLATIONS = {
     plan_ai: 'Plan with AI',
     how_title: 'How it works',
     how_sub: 'Your perfect trip in 3 simple steps',
-    step1_title: 'Pick a destination',
-    step1_desc: "Choose from Myanmar's best destinations",
-    step2_title: 'Set days & budget',
-    step2_desc: 'Tell us how long and your budget in MMK',
-    step3_title: 'Get your AI itinerary',
-    step3_desc: 'Gemini AI crafts your perfect day-by-day plan',
-    footer_tagline: 'AI-powered travel planning for Myanmar.',
-    free: 'Free to use',
-    nocard: 'No credit card needed',
-    mmk: 'MMK pricing',
+    s1t: 'Pick a destination', s1d: "Choose from Myanmar's best destinations",
+    s2t: 'Set days & budget', s2d: 'Tell us how long and your budget in MMK',
+    s3t: 'Get your AI itinerary', s3d: 'Gemini AI crafts your perfect day-by-day plan',
+    footer: 'AI-powered travel planning for Myanmar.',
+    free: 'Free to use', nocard: 'No credit card', mmk: 'MMK pricing',
   },
   mm: {
     nav_destinations: 'ခရီးစဉ်များ',
     nav_plan: 'ခရီးစီစဉ်ရန်',
     nav_signin: 'ဝင်ရောက်ရန်',
-    hero_headline_1: 'သင့်ခရီးစဉ်ကို',
-    hero_headline_2: 'စီစဉ်ပါ',
+    hero_line1: 'သင့်ခရီးစဉ်ကို',
+    hero_line2: 'စီစဉ်ပါ',
     hero_sub: 'အခမဲ့ စတင်စီစဉ်ပါ — အလွယ်တကူ',
     hero_cta: 'စတင်စီစဉ်ရန်',
     hero_cta2: 'ခရီးစဉ်များ ကြည့်ရန်',
@@ -48,16 +44,11 @@ const TRANSLATIONS = {
     plan_ai: 'AI ဖြင့် စီစဉ်',
     how_title: 'ဘယ်လိုအသုံးပြုမလဲ',
     how_sub: 'ရိုးရှင်းသော အဆင့် ၃ ဆင့်',
-    step1_title: 'ခရီးစဉ်ရွေးပါ',
-    step1_desc: 'မြန်မာ၏ အကောင်းဆုံး နေရာများမှ ရွေးချယ်ပါ',
-    step2_title: 'ရက်နှင့် ဘတ်ဂျက်',
-    step2_desc: 'ကြာချိန်နှင့် ဘတ်ဂျက် MMK ဖြင့် ထည့်သွင်းပါ',
-    step3_title: 'AI အစီအစဉ် ရယူပါ',
-    step3_desc: 'Gemini AI မှ နေ့ဆင့် အစီအစဉ် ရေးဆွဲပေးသည်',
-    footer_tagline: 'မြန်မာနိုင်ငံအတွက် AI ခရီးစဉ်စီစဉ်မှု။',
-    free: 'အခမဲ့ အသုံးပြုနိုင်',
-    nocard: 'ကတ်မလိုအပ်',
-    mmk: 'MMK ဈေးနှုန်း',
+    s1t: 'ခရီးစဉ်ရွေးပါ', s1d: 'မြန်မာ၏ အကောင်းဆုံး နေရာများမှ ရွေးချယ်ပါ',
+    s2t: 'ရက်နှင့် ဘတ်ဂျက်', s2d: 'ကြာချိန်နှင့် ဘတ်ဂျက် MMK ဖြင့် ထည့်သွင်းပါ',
+    s3t: 'AI အစီအစဉ် ရယူပါ', s3d: 'Gemini AI မှ နေ့ဆင့် အစီအစဉ် ရေးဆွဲပေးသည်',
+    footer: 'မြန်မာနိုင်ငံအတွက် AI ခရီးစဉ်စီစဉ်မှု။',
+    free: 'အခမဲ့', nocard: 'ကတ်မလိုအပ်', mmk: 'MMK ဈေးနှုန်း',
   },
 }
 
@@ -66,84 +57,98 @@ export default function HomePage() {
   const t = TRANSLATIONS[lang]
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-surface text-primary">
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
               <MapPin className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-900">Raizen</span>
+            <span className="text-lg font-bold text-primary">Raizen</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/destinations" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+          {/* Center nav */}
+          <div className="hidden md:flex items-center gap-6">
+            <Link href="/destinations" className="text-sm font-medium text-secondary hover:text-primary transition-colors">
               {t.nav_destinations}
             </Link>
-            <Link href="/planner" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+            <Link href="/planner" className="text-sm font-medium text-secondary hover:text-primary transition-colors">
               {t.nav_plan}
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center bg-slate-100 rounded-full p-1">
-              <button onClick={() => setLang('en')} className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'en' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
+          {/* Right side */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Language toggle */}
+            <div className="flex items-center bg-surface-2 border border-theme rounded-full p-0.5">
+              <button onClick={() => setLang('en')}
+                className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'en' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}>
                 EN
               </button>
-              <button onClick={() => setLang('mm')} className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'mm' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
+              <button onClick={() => setLang('mm')}
+                className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${lang === 'mm' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}>
                 မြန်မာ
               </button>
             </div>
-            <Link href="/login" className="hidden md:block text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+
+            {/* Dark/light toggle */}
+            <ThemeToggle />
+
+            <Link href="/login" className="hidden sm:block text-sm font-medium text-secondary hover:text-primary transition-colors">
               {t.nav_signin}
             </Link>
-            <Link href="/planner" className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
-              <Sparkles className="w-4 h-4" />
-              {t.nav_plan}
+            <Link href="/planner" className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t.nav_plan}</span>
             </Link>
           </div>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="pt-16 min-h-screen flex items-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-slate-50" />
-        <div className="absolute top-0 right-0 w-[700px] h-[700px] bg-blue-100/50 rounded-full blur-3xl -translate-y-1/3 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-50 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" />
-        <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'linear-gradient(#2563eb 1px, transparent 1px), linear-gradient(90deg, #2563eb 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
+      <section className="pt-16 min-h-[90vh] flex items-center relative overflow-hidden">
+        {/* Cream/dark gradient background */}
+        <div className="absolute inset-0 bg-surface" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-40 bg-blue-200 dark:bg-blue-900/30 -translate-y-1/4 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-3xl opacity-30 bg-amber-100 dark:bg-slate-700/30 translate-y-1/4 -translate-x-1/4" />
+        {/* Subtle dot grid */}
+        <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
+          style={{ backgroundImage: 'radial-gradient(circle, #2563eb 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-20 w-full">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-blue-600 text-sm font-medium mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-blue-600 dark:text-blue-400 text-sm font-medium mb-8 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/50">
               <Sparkles className="w-4 h-4" />
               AI-Powered Myanmar Travel Planner
             </div>
 
-            <h1 className="text-6xl md:text-7xl font-bold text-slate-900 leading-tight tracking-tight mb-6">
-              {t.hero_headline_1}<br />
-              <span className="text-blue-600">{t.hero_headline_2}</span>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-primary leading-tight tracking-tight mb-6">
+              {t.hero_line1}<br />
+              <span className="text-blue-600 dark:text-blue-400">{t.hero_line2}</span>
             </h1>
 
-            <p className="text-xl text-slate-500 mb-10 leading-relaxed">{t.hero_sub}</p>
+            <p className="text-lg sm:text-xl text-secondary mb-10 leading-relaxed max-w-xl">
+              {t.hero_sub}
+            </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/planner" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all text-lg hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5">
-                <Sparkles className="w-5 h-5" />
-                {t.hero_cta}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/planner"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all text-base sm:text-lg hover:shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/40 hover:-translate-y-0.5">
+                <Sparkles className="w-5 h-5" />{t.hero_cta}
               </Link>
-              <Link href="/destinations" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200 transition-all text-lg hover:border-blue-200 hover:-translate-y-0.5">
-                {t.hero_cta2}
-                <ArrowRight className="w-5 h-5" />
+              <Link href="/destinations"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-card hover:bg-surface-2 text-primary font-semibold rounded-xl border border-card transition-all text-base sm:text-lg hover:-translate-y-0.5">
+                {t.hero_cta2}<ArrowRight className="w-5 h-5" />
               </Link>
             </div>
 
-            <div className="flex flex-wrap items-center gap-6 mt-12 text-sm text-slate-400">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-10 text-sm text-muted">
               {[t.free, t.nocard, t.mmk].map((item) => (
                 <div key={item} className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                  {item}
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />{item}
                 </div>
               ))}
             </div>
@@ -152,14 +157,16 @@ export default function HomePage() {
       </section>
 
       {/* FEATURED — Ngwe Saung */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-20 sm:py-24 px-4 sm:px-6 bg-surface-2">
         <div className="max-w-7xl mx-auto">
-          <p className="text-xs font-bold tracking-widest text-blue-500 uppercase mb-6">{t.featured_label}</p>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative rounded-3xl overflow-hidden h-[420px] shadow-xl shadow-slate-200">
-              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&auto=format&fit=crop" alt="Ngwe Saung Beach" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent" />
-              <div className="absolute bottom-6 left-6 flex gap-2">
+          <p className="text-xs font-bold tracking-widest text-blue-500 dark:text-blue-400 uppercase mb-6">{t.featured_label}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            {/* Image */}
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-72 sm:h-[420px] shadow-xl shadow-black/10 dark:shadow-black/30">
+              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&auto=format&fit=crop"
+                alt="Ngwe Saung Beach" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent" />
+              <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 flex gap-2">
                 <div className="flex items-center gap-1 bg-white/90 backdrop-blur rounded-full px-3 py-1.5 text-sm font-semibold text-slate-700">
                   <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />4.8
                 </div>
@@ -169,22 +176,24 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="space-y-6">
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">{t.featured_name}</h2>
-              <p className="text-lg text-slate-500 leading-relaxed">{t.featured_desc}</p>
-              <div className="grid grid-cols-2 gap-3">
+            {/* Content */}
+            <div className="space-y-5">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary leading-tight">{t.featured_name}</h2>
+              <p className="text-base sm:text-lg text-secondary leading-relaxed">{t.featured_desc}</p>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {['20km Coastline', 'Lover Island', 'Fresh Seafood', 'Water Sports', 'Luxury Resorts', 'Beach Bonfires'].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-slate-600">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                    {item}
+                  <div key={item} className="flex items-center gap-2 text-sm text-secondary">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />{item}
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-4 pt-2">
-                <Link href="/destinations/ngwesaung" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">
-                  {t.featured_cta} <ArrowRight className="w-4 h-4" />
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2">
+                <Link href="/destinations/ngwesaung"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">
+                  {t.featured_cta}<ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link href="/planner?destination=Ngwe Saung" className="inline-flex items-center gap-2 px-6 py-3 border border-slate-200 hover:border-blue-200 hover:bg-blue-50 text-slate-700 font-semibold rounded-xl transition-colors text-sm">
+                <Link href="/planner?destination=Ngwe Saung"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-card hover:bg-surface-3 text-primary font-semibold rounded-xl border border-card transition-colors text-sm">
                   <Sparkles className="w-4 h-4 text-blue-500" />{t.plan_ai}
                 </Link>
               </div>
@@ -194,32 +203,33 @@ export default function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-24 px-6 bg-slate-50">
+      <section className="py-20 sm:py-24 px-4 sm:px-6 bg-surface">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-3">{t.how_title}</h2>
-            <p className="text-slate-500">{t.how_sub}</p>
+          <div className="text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-3">{t.how_title}</h2>
+            <p className="text-secondary">{t.how_sub}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { step: '01', icon: <MapPin className="w-6 h-6" />, title: t.step1_title, desc: t.step1_desc },
-              { step: '02', icon: <Clock className="w-6 h-6" />, title: t.step2_title, desc: t.step2_desc },
-              { step: '03', icon: <Sparkles className="w-6 h-6" />, title: t.step3_title, desc: t.step3_desc },
+              { step: '01', icon: <MapPin className="w-5 h-5" />, title: t.s1t, desc: t.s1d },
+              { step: '02', icon: <Clock className="w-5 h-5" />, title: t.s2t, desc: t.s2d },
+              { step: '03', icon: <Sparkles className="w-5 h-5" />, title: t.s3t, desc: t.s3d },
             ].map((item) => (
-              <div key={item.step} className="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+              <div key={item.step} className="bg-card rounded-2xl p-6 sm:p-8 border border-card shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
                     {item.icon}
                   </div>
-                  <span className="text-4xl font-bold text-slate-100">{item.step}</span>
+                  <span className="text-4xl font-bold text-surface-3 dark:text-surface select-none">{item.step}</span>
                 </div>
-                <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-primary text-lg mb-2">{item.title}</h3>
+                <p className="text-secondary text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
-          <div className="text-center mt-12">
-            <Link href="/planner" className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5">
+          <div className="text-center mt-10">
+            <Link href="/planner"
+              className="inline-flex items-center gap-2 px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/40 hover:-translate-y-0.5">
               <Sparkles className="w-5 h-5" />{t.hero_cta}
             </Link>
           </div>
@@ -227,21 +237,21 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-slate-900 text-white py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="bg-surface-2 border-t border-theme py-10 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
               <MapPin className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="font-bold text-lg">Raizen</span>
-            <span className="text-slate-400 text-sm ml-2">— {t.footer_tagline}</span>
+            <span className="font-bold text-primary">Raizen</span>
+            <span className="text-muted text-sm">— {t.footer}</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-slate-400">
-            <Link href="/destinations" className="hover:text-white transition-colors">{t.nav_destinations}</Link>
-            <Link href="/planner" className="hover:text-white transition-colors">{t.nav_plan}</Link>
-            <Link href="/login" className="hover:text-white transition-colors">{t.nav_signin}</Link>
+          <div className="flex items-center gap-5 text-sm text-secondary">
+            <Link href="/destinations" className="hover:text-primary transition-colors">{t.nav_destinations}</Link>
+            <Link href="/planner" className="hover:text-primary transition-colors">{t.nav_plan}</Link>
+            <Link href="/login" className="hover:text-primary transition-colors">{t.nav_signin}</Link>
           </div>
-          <p className="text-slate-600 text-xs">© {new Date().getFullYear()} Raizen 🇲🇲</p>
+          <p className="text-muted text-xs">© {new Date().getFullYear()} Raizen 🇲🇲</p>
         </div>
       </footer>
     </div>
