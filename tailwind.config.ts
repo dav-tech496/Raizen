@@ -9,26 +9,30 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['var(--font-syne)', 'Syne', 'sans-serif'],
+        body: ['var(--font-dm)', 'DM Sans', 'sans-serif'],
       },
       colors: {
-        gold: { DEFAULT: '#f59e0b', light: '#fbbf24' },
-        // Light mode: warm cream
-        surface: {
-          light: '#faf9f7',
-          'light-2': '#f3f1ee',
-          'light-3': '#eae7e2',
+        brand: '#2563eb',
+        'brand-dark': '#1d4ed8',
+        'brand-light': '#3b82f6',
+      },
+      animation: {
+        'fade-up': 'fadeUp 0.6s ease forwards',
+        'fade-in': 'fadeIn 0.4s ease forwards',
+      },
+      keyframes: {
+        fadeUp: {
+          '0%': { opacity: '0', transform: 'translateY(24px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        // Dark mode: dark slate grey
-        slate: {
-          850: '#1e2330',
-          900: '#171c28',
-          950: '#111520',
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
       },
     },
   },
   plugins: [],
 }
-
 export default config

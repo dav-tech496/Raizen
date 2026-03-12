@@ -3,8 +3,45 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Sparkles, Wallet, Calendar, Bookmark, BookmarkCheck, Shield, Lightbulb, Clock, ChevronDown, ChevronUp, Hotel, CheckCircle } from 'lucide-react'
+import { Sparkles, Wallet, Calendar, Bookmark, BookmarkCheck, Shield, Lightbulb, Clock, ChevronDown, ChevronUp, Hotel, CheckCircle, MapPin, ArrowRight, Waves } from 'lucide-react'
+import { useLang } from '@/components/theme/LangProvider'
 import type { User } from '@supabase/supabase-js'
+
+const DESTINATIONS = [
+  {
+    id: 'ngwesaung',
+    nameEn: 'Ngwe Saung Beach',
+    nameMm: 'ငွေဆောင် ကမ်းခြေ',
+    regionEn: 'Ayeyarwady Region',
+    regionMm: 'အင်းဝမဒေသ',
+    descEn: 'Myanmar\'s most pristine 20km white sand beach on the Bay of Bengal.',
+    descMm: 'ဘင်္ဂလားပင်လယ်အော်ရှိ မြန်မာ၏ အသန့်ရှင်းဆုံး ကမ်းခြေ ၂၀ ကီလိုမီတာ',
+    img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop',
+    available: true,
+  },
+  {
+    id: 'bagan',
+    nameEn: 'Bagan',
+    nameMm: 'ပုဂံ',
+    regionEn: 'Mandalay Region',
+    regionMm: 'မန္တလေးတိုင်း',
+    descEn: 'Ancient temples and hot air balloons — coming soon.',
+    descMm: 'ရှေးဟောင်းဘုရားကျောင်းများ — မကြာမီ ထပ်တိုးမည်',
+    img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&auto=format&fit=crop',
+    available: false,
+  },
+  {
+    id: 'inlelake',
+    nameEn: 'Inle Lake',
+    nameMm: 'အင်းလေး',
+    regionEn: 'Shan State',
+    regionMm: 'ရှမ်းပြည်နယ်',
+    descEn: 'Floating villages and serene waters — coming soon.',
+    descMm: 'မျောနေသောရွာများ — မကြာမီ ထပ်တိုးမည်',
+    img: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&auto=format&fit=crop',
+    available: false,
+  },
+]
 
 const HOTELS = [
   { name: 'AHTINKAYA RESORT', category: 'Luxury', rooms: [
@@ -67,6 +104,8 @@ function getAffordableHotels(totalBudget: number, days: number) {
 
 function PlannerContent() {
   const searchParams = useSearchParams()
+  const { lang } = useLang()
+  const [selectedDest, setSelectedDest] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [days, setDays] = useState(3)
   const [budget, setBudget] = useState(1500000)
@@ -132,6 +171,81 @@ function PlannerContent() {
   }
 
   const remaining = budget - (itinerary?.total_estimated_budget ?? 0)
+  const activeDest = DESTINATIONS.find(d => d.id === selectedDest)
+
+  // ── STEP 1: Destination selector ──
+  if (!selectedDest) {
+    return (
+      <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 bg-surface text-primary">
+        <div className="max-w-4xl mx-auto w-full">
+          <div className="text-center mb-12">
+            <div className="section-label mx-auto mb-5">
+              {lang === 'en' ? 'Trip Planner' : 'ခရီးစဉ်စီစဉ်သူ'}
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-display font-bold text-primary mb-4">
+              {lang === 'en' ? 'Where are you\ngoing?' : 'ဘယ်ကို\nသွားမလဲ?'}
+            </h1>
+            <p className="text-secondary font-body text-lg">
+              {lang === 'en' ? 'Choose your destination to start planning.' : 'စီစဉ်ရန် ခရီးစဉ်ကို ရွေးချယ်ပါ'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {DESTINATIONS.map(dest => (
+              <button
+                key={dest.id}
+                onClick={() => dest.available && setSelectedDest(dest.id)}
+                disabled={!dest.available}
+                className={`relative rounded-2xl overflow-hidden text-left transition-all duration-300 group ${
+                  dest.available
+                    ? 'hover:-translate-y-1 hover:shadow-xl hover:shadow-black/15 cursor-pointer'
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={dest.img}
+                    alt={lang === 'en' ? dest.nameEn : dest.nameMm}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  {!dest.available && (
+                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/50 backdrop-blur text-white text-xs font-semibold rounded-full font-body">
+                      {lang === 'en' ? 'Coming Soon' : 'မကြာမီ'}
+                    </div>
+                  )}
+                  {dest.available && (
+                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full font-body flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
+                      {lang === 'en' ? 'Available' : 'ရနိုင်သည်'}
+                    </div>
+                  )}
+                  <div className="absolute bottom-4 left-4">
+                    <p className="text-white/70 text-xs font-body mb-0.5">
+                      {lang === 'en' ? dest.regionEn : dest.regionMm}
+                    </p>
+                    <h3 className="text-white font-display text-xl font-bold">
+                      {lang === 'en' ? dest.nameEn : dest.nameMm}
+                    </h3>
+                  </div>
+                </div>
+                <div className="glass-card p-4 rounded-b-2xl border-t-0">
+                  <p className="text-secondary text-xs font-body leading-relaxed">
+                    {lang === 'en' ? dest.descEn : dest.descMm}
+                  </p>
+                  {dest.available && (
+                    <div className="flex items-center gap-1 mt-3 text-blue-600 dark:text-blue-400 text-xs font-semibold font-body">
+                      {lang === 'en' ? 'Plan this trip' : 'စီစဉ်ရန်'} <ArrowRight className="w-3 h-3" />
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 bg-surface text-primary">
@@ -139,12 +253,21 @@ function PlannerContent() {
 
         {/* Header */}
         <div className="text-center mb-14">
-          <div className="section-label mb-6 mx-auto w-fit"><Sparkles className="w-3 h-3" /> AI Trip Planner</div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-primary">
-            Plan Your<br /><span className="gradient-text">Ngwe Saung Escape</span>
+          <button
+            onClick={() => { setSelectedDest(null); setItinerary(null) }}
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-secondary font-body mb-6 transition-colors"
+          >
+            ← {lang === 'en' ? 'Change destination' : 'ခရီးစဉ် ပြောင်းရန်'}
+          </button>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold mb-4 text-primary">
+            {lang === 'en' ? 'Plan Your' : 'သင့်ခရီးစဉ်'}<br />
+            <span className="gradient-text">{lang === 'en' ? (activeDest?.nameEn ?? 'Escape') : (activeDest?.nameMm ?? 'ခရီးစဉ်')}</span>
           </h1>
-          <p className="text-secondary text-xl max-w-lg mx-auto">
-            Set your budget and days — our AI builds your complete itinerary with hotels that fit your wallet.
+          <p className="text-secondary text-lg max-w-lg mx-auto font-body">
+            {lang === 'en'
+              ? 'Set your budget and days — our AI builds your complete itinerary with hotels that fit your wallet.'
+              : 'ဘတ်ဂျက်နှင့် ရက်အရေအတွက် သတ်မှတ်ပါ — AI မှ သင့်ဘတ်ဂျက်နှင့် ကိုက်ညီသော ဟိုတယ်များဖြင့် ပြည့်စုံသော စီစဉ်မှု ရေးဆွဲပေးမည်'
+            }
           </p>
         </div>
 

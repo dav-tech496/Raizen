@@ -4,7 +4,6 @@ import './globals.css'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import { LangProvider } from '@/components/theme/LangProvider'
 import { AppNavbar } from '@/components/layout/AppNavbar'
-import { MobileNav } from '@/components/layout/MobileNav'
 
 const syne = Syne({
   subsets: ['latin'],
@@ -31,7 +30,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LangProvider>
             <AppNavbar />
             {children}
-            <MobileNav />
           </LangProvider>
         </ThemeProvider>
       </body>
