@@ -1,17 +1,17 @@
-import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
+'use client'
+
+import { notFound, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { MapPin, ArrowRight, CheckCircle, Waves, Sun, Wind, Star } from 'lucide-react'
+import { useState, use } from 'react'
+import { MapPin, ArrowRight, CheckCircle, Waves, Sun, Star, X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
+import { useLang } from '@/components/theme/LangProvider'
 
 export const dynamic = 'force-dynamic'
 
-interface Props { params: { slug: string } }
-
 const HOTELS = [
   {
-    name: 'AHTINKAYA RESORT',
-    category: 'Luxury',
-    color: 'from-amber-500/20 to-orange-500/10',
+    name: 'AHTINKAYA RESORT', category: 'Luxury', categoryMm: 'လူဇရီ',
+    color: 'bg-amber-500/10 border-amber-500/20',
     rooms: [
       { type: 'Executive Deluxe', price: 350000 },
       { type: 'Sea View Villa (2nd Row)', price: 450000 },
@@ -21,9 +21,8 @@ const HOTELS = [
     ],
   },
   {
-    name: 'EXCEL HOTEL',
-    category: 'Mid-Range',
-    color: 'from-blue-500/20 to-cyan-500/10',
+    name: 'EXCEL HOTEL', category: 'Mid-Range', categoryMm: 'အလတ်စား',
+    color: 'bg-blue-500/10 border-blue-500/20',
     rooms: [
       { type: 'Garden View (2 Pax)', price: 158000 },
       { type: 'Deluxe Garden View (2 Pax)', price: 170000 },
@@ -35,36 +34,30 @@ const HOTELS = [
     ],
   },
   {
-    name: 'CENTER POINT',
-    category: 'Premium',
-    color: 'from-purple-500/20 to-pink-500/10',
+    name: 'CENTER POINT', category: 'Premium', categoryMm: 'ပရီမီယံ',
+    color: 'bg-purple-500/10 border-purple-500/20',
     rooms: [
       { type: 'Executive Family Seafront Bungalow (4 Pax)', price: 790000 },
       { type: 'Executive Seafront Bungalow (2 Pax)', price: 570000 },
       { type: 'Executive 2nd Seaview Bungalow (2 Pax)', price: 570000 },
       { type: 'Deluxe Seaview Building (2 Pax)', price: 320000 },
       { type: 'Deluxe Garden View Building (2 Pax)', price: 320000 },
-      { type: 'Extra Bed (Bungalow)', price: 115000 },
-      { type: 'Extra Bed (Deluxe)', price: 75000 },
     ],
   },
   {
-    name: 'OCEAN PARADISE',
-    category: 'Boutique',
-    color: 'from-teal-500/20 to-emerald-500/10',
+    name: 'OCEAN PARADISE', category: 'Boutique', categoryMm: 'ဘူတစ်',
+    color: 'bg-cyan-500/10 border-cyan-500/20',
     rooms: [
       { type: 'Sky Suite Penthouse (3 Pax)', price: 225000 },
       { type: 'Ocean Suite Penthouse', price: 172500 },
       { type: 'Ocean Suite Sea Side', price: 150000 },
       { type: 'Ocean Superior Penthouse', price: 135000 },
       { type: 'Ocean Superior With Balcony', price: 112500 },
-      { type: 'Ocean Superior Without Balcony', price: 105000 },
     ],
   },
   {
-    name: 'SUNNY VILLA',
-    category: 'Villa',
-    color: 'from-yellow-500/20 to-amber-500/10',
+    name: 'SUNNY VILLA', category: 'Villa', categoryMm: 'ဗီလာ',
+    color: 'bg-green-500/10 border-green-500/20',
     rooms: [
       { type: 'Villa Superior (2 Pax)', price: 135000 },
       { type: 'Villa (2 Pax)', price: 110000 },
@@ -74,170 +67,278 @@ const HOTELS = [
   },
 ]
 
-const HIGHLIGHTS = [
-  '20km White Sand Beach',
-  'Crystal Clear Water',
-  'Lover Island Day Trip',
-  'Fresh Seafood Restaurants',
-  'Water Sports & Snorkeling',
-  'Beach Sunrise & Sunset',
-  'Fishing Village Culture',
-  'Peaceful & Uncrowded',
-]
-
+// Carefully curated Unsplash photos — accurate match to Ngwe Saung:
+// white sand beach, tropical resort pool, Bay of Bengal water activities
 const GALLERY = [
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1520454974749-611f37e6bcdf?w=800&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1516815231560-8f41ec531527?w=800&q=80&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&q=80&auto=format&fit=crop',
+  {
+    src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=85&auto=format&fit=crop',
+    labelEn: 'White Sand Coastline', labelMm: 'သဲဖြူ ကမ်းခြေ',
+    span: 'col-span-2 row-span-2',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=800&q=85&auto=format&fit=crop',
+    labelEn: 'Crystal Clear Waters', labelMm: 'ကင်္ဂါလင်ကြည် ရေ',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=85&auto=format&fit=crop',
+    labelEn: 'Resort Pool', labelMm: 'ရစောတ် ကူးကန်',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1520454974749-611f37e6bcdf?w=800&q=85&auto=format&fit=crop',
+    labelEn: 'Tropical Beach Escape', labelMm: 'ကမ်းခြေ အနားယူ',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=85&auto=format&fit=crop',
+    labelEn: 'Water Sports & Activities', labelMm: 'ရေကစားခြင်း',
+    span: '',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=85&auto=format&fit=crop',
+    labelEn: 'Beach Sunset', labelMm: 'ကမ်းခြေ နေဝင်ချိန်',
+    span: '',
+  },
 ]
 
-export default async function DestinationPage({ params }: Props) {
-  if (params.slug !== 'ngwesaung') notFound()
+const CONTENT = {
+  en: {
+    region: 'Ayeyarwady Region, Myanmar',
+    hero_sub: "Myanmar's most pristine beach — 20km of white sand on the Bay of Bengal",
+    about_label: 'About the Destination',
+    about_title: 'Where the Bay Meets',
+    about_title2: 'Untouched Paradise',
+    about_p1: "Ngwe Saung (Silver Beach) is one of Myanmar's most beautiful and least-developed beaches. Located about 6 hours from Yangon by road, the beach stretches for 20 uninterrupted kilometers — just sand, sea, and sky.",
+    about_p2: "Unlike the busier Ngapali Beach, Ngwe Saung retains a quiet, authentic character. Local fishing villages dot the coastline, seafood restaurants serve the morning catch, and resorts range from budget-friendly villas to luxury seafront bungalows.",
+    highlights: ['20km White Sand Beach', 'Lover\'s Island nearby', 'Luxury Resorts', 'Fresh Seafood Restaurants', 'Water Sports & Snorkeling', 'Peaceful & Uncrowded'],
+    plan_title: 'Plan Your Visit',
+    plan_sub: 'Enter your budget and get a day-by-day itinerary with real hotel pricing.',
+    plan_cta: 'Generate Itinerary',
+    best_time_label: 'Best Time to Visit',
+    best_time: 'November — April (Dry Season)',
+    gallery_label: 'Gallery',
+    gallery_title: 'See the Beauty',
+    gallery_title2: 'Up Close',
+    hotels_label: 'Where to Stay',
+    hotels_title: 'Verified Hotels &',
+    hotels_title2: 'Real MMK Pricing',
+    hotels_sub: 'All prices in Myanmar Kyat (MMK) per night. AI Planner matches rooms to your budget automatically.',
+    from: 'From',
+    per_night: '/night',
+    find_hotel: 'Find Hotels Within My Budget',
+    badges: ['20km Beach', 'Year-Round Sun', 'Bay of Bengal', '5 Resorts'],
+  },
+  mm: {
+    region: 'အင်းဝမဒေသ၊ မြန်မာနိုင်ငံ',
+    hero_sub: 'မြန်မာ၏ အသန့်ရှင်းဆုံး ကမ်းခြေ — ဘင်္ဂလားပင်လယ်အော်တွင် သဲဖြူ ၂၀ ကီလိုမီတာ',
+    about_label: 'ခရီးစဉ် အကြောင်း',
+    about_title: 'ပင်လယ်နှင့်',
+    about_title2: 'သဘာဝ တွေ့ဆုံရာ',
+    about_p1: 'ငွေဆောင် (ငွေကမ်းခြေ) သည် မြန်မာနိုင်ငံ၏ အလှဆုံးနှင့် ဖွံ့ဖြိုးမှုနည်းသည့် ကမ်းခြေများထဲမှ တစ်ခုဖြစ်သည်။ ရန်ကုန်မှ ကားဖြင့် ၆ နာရီခန့် ကြာသော ဤကမ်းခြေသည် ၂၀ ကီလိုမီတာ ဆက်တိုက် ဆန့်တန်းနေသည်။',
+    about_p2: 'ငွပါလီ ကမ်းခြေနှင့် မတူဘဲ ငွေဆောင်သည် တိတ်ဆိတ်ငြိမ်သက်သော စစ်မှန်သည့် ဇာတိပုံရိပ်ကို ထိန်းသိမ်းထားသည်။ ငါးဖမ်းရွာများ၊ ပင်လယ်ဆိပ် စားသောက်ဆိုင်များနှင့် ဘတ်ဂျက်မှ လူဇရီ ဟိုတယ်များအထိ ရှိသည်။',
+    highlights: ['သဲဖြူ ကမ်းခြေ ၂၀ ကီလို', 'ချစ်သူ ကျွန်းနီးစပ်', 'လူဇရီ ဟိုတယ်', 'ပင်လယ်ဆိပ် စားသောက်ဆိုင်', 'ရေကစား နှင့် ငရုတ်ကောင်းမြင်', 'တိတ်ဆိတ်ငြိမ်သက်'],
+    plan_title: 'ခရီးစဉ် စီစဉ်ရန်',
+    plan_sub: 'ဘတ်ဂျက် ထည့်သွင်းပြီး ဟိုတယ်ဈေးနှုန်းဖြင့် နေ့ဆင့် စီစဉ်မှု ရယူပါ',
+    plan_cta: 'စီစဉ်မှု ထုတ်ရန်',
+    best_time_label: 'သွားသင့်သည့်အချိန်',
+    best_time: 'နိုဝင်ဘာ — ဧပြီ (မိုးခြောက်ရာသီ)',
+    gallery_label: 'ဓာတ်ပုံများ',
+    gallery_title: 'လှပသောအလှ',
+    gallery_title2: 'နီးနီးကပ်ကပ် ကြည့်ရှုပါ',
+    hotels_label: 'နေမည့်နေရာ',
+    hotels_title: 'အတည်ပြုထားသော ဟိုတယ် နှင့်',
+    hotels_title2: 'MMK ဈေးနှုန်း',
+    hotels_sub: 'ဈေးနှုန်းအားလုံး တစ်ညအတွက် မြန်မာကျပ်ငွေ (MMK) ဖြင့်ဖြစ်သည်',
+    from: 'မှစ၍',
+    per_night: '/ည',
+    find_hotel: 'ကျွန်ုပ်ဘတ်ဂျက်နှင့် ကိုက်ညီသော ဟိုတယ်',
+    badges: ['ကမ်းခြေ ၂၀ ကီလို', 'နေရောင်ခြည်', 'ဘင်္ဂလားပင်လယ်', 'ဟိုတယ် ၅ ခု'],
+  },
+}
+
+interface Props { params: Promise<{ slug: string }> | { slug: string } }
+
+export default function DestinationPage({ params }: Props) {
+  const resolvedParams = 'then' in params ? use(params as Promise<{ slug: string }>) : params
+  if (resolvedParams.slug !== 'ngwesaung') notFound()
+
+  const { lang } = useLang()
+  const t = CONTENT[lang]
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-surface text-primary pb-16 md:pb-0">
 
-      {/* Hero */}
-      <div className="relative h-screen overflow-hidden">
+      {/* ── HERO ── */}
+      <div className="relative h-[70vh] sm:h-screen overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=85&auto=format&fit=crop"
           alt="Ngwe Saung Beach"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/20 via-transparent to-stone-950" />
-        <div className="absolute inset-0 bg-gradient-to-r from-stone-950/50 via-transparent to-transparent" />
-
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 max-w-6xl mx-auto">
-          <div className="flex items-center gap-2 text-amber-400 text-sm font-medium mb-4">
-            <MapPin className="w-4 h-4" />
-            Ayeyarwady Region, Myanmar
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/80" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 md:p-16 max-w-6xl mx-auto">
+          <div className="flex items-center gap-2 text-amber-400 text-sm font-medium mb-3 font-body">
+            <MapPin className="w-4 h-4" />{t.region}
           </div>
-          <h1 className="text-6xl md:text-8xl font-bold mb-4 text-shadow-lg">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-display font-bold text-white mb-3 leading-none">
             Ngwe Saung
           </h1>
-          <p className="text-white/70 text-xl max-w-lg mb-8 font-light">
-            Myanmar&apos;s most pristine beach — 20km of white sand on the Bay of Bengal
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {[
-              { icon: Waves, label: '20km Beach' },
-              { icon: Sun, label: 'Year-Round Sun' },
-              { icon: Wind, label: 'Sea Breeze' },
-              { icon: Star, label: '5 Resorts' },
-            ].map((badge) => (
-              <div key={badge.label} className="flex items-center gap-2 glass px-4 py-2 rounded-full text-sm font-medium">
-                <badge.icon className="w-4 h-4 text-amber-400" />
-                {badge.label}
+          <p className="text-white/70 text-base sm:text-xl max-w-lg mb-6 font-body">{t.hero_sub}</p>
+          <div className="flex flex-wrap gap-2">
+            {t.badges.map(b => (
+              <div key={b} className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full text-white text-xs font-semibold font-body">
+                <Star className="w-3 h-3 text-amber-400" />{b}
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-20">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
 
-        {/* About + Plan sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-24">
-          <div className="lg:col-span-2">
-            <div className="section-label mb-6">About the Destination</div>
-            <h2 className="text-4xl font-bold mb-6">Where the Bay Meets<br /><span className="gradient-text">Untouched Paradise</span></h2>
-            <p className="text-white/60 text-lg leading-relaxed mb-6">
-              Ngwe Saung (Silver Beach) is one of Myanmar&apos;s most beautiful and least-developed beaches. 
-              Located about 6 hours from Yangon by road, or accessible by flight to Pathein, the beach stretches 
-              for 20 uninterrupted kilometers with almost no development — just sand, sea, and sky.
-            </p>
-            <p className="text-white/60 leading-relaxed mb-10">
-              Unlike the busier Ngapali Beach, Ngwe Saung retains a quiet, authentic character. 
-              Local fishing villages dot the coastline, seafood restaurants serve the morning catch, 
-              and resorts range from budget-friendly villas to luxury seafront bungalows.
-            </p>
-
-            {/* Highlights */}
-            <div className="grid grid-cols-2 gap-3">
-              {HIGHLIGHTS.map((h) => (
+        {/* ── ABOUT + PLAN SIDEBAR ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-20">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="section-label">{t.about_label}</div>
+            <h2 className="text-3xl sm:text-4xl font-display font-bold text-primary leading-tight">
+              {t.about_title}<br />
+              <span className="gradient-text">{t.about_title2}</span>
+            </h2>
+            <p className="text-secondary leading-relaxed font-body">{t.about_p1}</p>
+            <p className="text-secondary leading-relaxed font-body">{t.about_p2}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              {t.highlights.map(h => (
                 <div key={h} className="flex items-center gap-3 glass-card rounded-xl p-3">
-                  <CheckCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span className="text-white/80 text-sm">{h}</span>
+                  <CheckCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                  <span className="text-secondary text-sm font-body">{h}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Sticky Plan Card */}
+          {/* Sticky plan card */}
           <div>
-            <div className="glass-card rounded-2xl p-6 sticky top-24">
-              <div className="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4">
-                <MapPin className="w-6 h-6 text-stone-900" />
+            <div className="glass-card rounded-2xl p-6 lg:sticky lg:top-24">
+              <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center mb-4">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Plan Your Visit</h3>
-              <p className="text-white/50 text-sm mb-6 leading-relaxed">
-                Enter your budget and get an AI-generated day-by-day itinerary with real hotel pricing.
-              </p>
+              <h3 className="font-display text-xl font-bold text-primary mb-2">{t.plan_title}</h3>
+              <p className="text-secondary text-sm mb-5 leading-relaxed font-body">{t.plan_sub}</p>
               <Link
-                href="/planner?destination=Ngwe Saung"
-                className="w-full flex items-center justify-center gap-2 px-6 py-4 gradient-gold text-stone-900 font-bold rounded-xl transition-all hover:opacity-90"
+                href="/planner"
+                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/20 font-body"
               >
-                Generate Itinerary
-                <ArrowRight className="w-4 h-4" />
+                {t.plan_cta}<ArrowRight className="w-4 h-4" />
               </Link>
-              <div className="mt-4 p-4 bg-amber-400/5 border border-amber-400/20 rounded-xl">
-                <div className="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-1">Best Time to Visit</div>
-                <div className="text-white/70 text-sm">November — April (Dry Season)</div>
+              <div className="mt-4 p-3.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-xl">
+                <div className="text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-1 font-body">{t.best_time_label}</div>
+                <div className="text-secondary text-sm font-body">{t.best_time}</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Photo Gallery */}
-        <div className="mb-24">
-          <div className="section-label mb-6">Gallery</div>
-          <h2 className="text-4xl font-bold mb-10">See the Beauty<br /><span className="gradient-text">Up Close</span></h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {GALLERY.map((src, i) => (
-              <div key={i} className={`rounded-2xl overflow-hidden card-hover ${i === 0 ? 'col-span-2 h-72' : 'h-48'}`}>
-                <img src={src} alt={`Ngwe Saung ${i + 1}`} className="w-full h-full object-cover" />
-              </div>
+        {/* ── GALLERY ── */}
+        <div className="mb-20">
+          <div className="section-label mb-4">{t.gallery_label}</div>
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-primary mb-8 leading-tight">
+            {t.gallery_title}<br />
+            <span className="gradient-text">{t.gallery_title2}</span>
+          </h2>
+
+          {/* Masonry-style grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 auto-rows-[180px]">
+            {GALLERY.map((item, i) => (
+              <button
+                key={i}
+                onClick={() => setLightboxIdx(i)}
+                className={`group relative rounded-2xl overflow-hidden cursor-pointer focus:outline-none ${item.span}`}
+              >
+                <img
+                  src={item.src}
+                  alt={lang === 'en' ? item.labelEn : item.labelMm}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <p className="text-white text-xs font-semibold font-body">
+                    {lang === 'en' ? item.labelEn : item.labelMm}
+                  </p>
+                </div>
+              </button>
             ))}
           </div>
+
+          {/* Lightbox */}
+          {lightboxIdx !== null && (
+            <div
+              className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+              onClick={() => setLightboxIdx(null)}
+            >
+              <button
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                onClick={() => setLightboxIdx(null)}
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + GALLERY.length) % GALLERY.length) }}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <img
+                src={GALLERY[lightboxIdx].src.replace('w=800', 'w=1400')}
+                alt={lang === 'en' ? GALLERY[lightboxIdx].labelEn : GALLERY[lightboxIdx].labelMm}
+                className="max-w-full max-h-[85vh] rounded-2xl object-contain"
+                onClick={e => e.stopPropagation()}
+              />
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                onClick={e => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % GALLERY.length) }}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/60 text-sm font-body">
+                {lang === 'en' ? GALLERY[lightboxIdx].labelEn : GALLERY[lightboxIdx].labelMm}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Hotels */}
+        {/* ── HOTELS ── */}
         <div>
-          <div className="section-label mb-6">Where to Stay</div>
-          <h2 className="text-4xl font-bold mb-4">
-            Verified Hotels &<br />
-            <span className="gradient-text">Real Pricing</span>
+          <div className="section-label mb-4">{t.hotels_label}</div>
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-primary mb-2 leading-tight">
+            {t.hotels_title}<br /><span className="gradient-text">{t.hotels_title2}</span>
           </h2>
-          <p className="text-white/50 text-lg mb-12 max-w-xl">
-            All prices are in Myanmar Kyat (MMK) per night. Use the AI Planner to match rooms to your budget automatically.
-          </p>
+          <p className="text-secondary text-base mb-10 max-w-xl font-body">{t.hotels_sub}</p>
 
-          <div className="space-y-6">
-            {HOTELS.map((hotel) => (
-              <div key={hotel.name} className={`glass-card rounded-2xl overflow-hidden`}>
-                <div className={`bg-gradient-to-r ${hotel.color} p-6 border-b border-white/5`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold">{hotel.name}</h3>
-                      <span className="text-amber-400 text-sm font-medium">{hotel.category}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-white/40 mb-1">Starting from</div>
-                      <div className="text-lg font-bold gradient-text">
-                        {Math.min(...hotel.rooms.map(r => r.price)).toLocaleString()} MMK
-                      </div>
+          <div className="space-y-5">
+            {HOTELS.map(hotel => (
+              <div key={hotel.name} className={`glass-card rounded-2xl overflow-hidden border ${hotel.color}`}>
+                <div className={`${hotel.color} px-6 py-4 flex items-center justify-between`}>
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-primary">{hotel.name}</h3>
+                    <span className="text-blue-600 dark:text-blue-400 text-sm font-semibold font-body">
+                      {lang === 'en' ? hotel.category : hotel.categoryMm}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-muted font-body">{t.from}</div>
+                    <div className="text-base font-bold text-blue-600 dark:text-blue-400 font-body">
+                      {Math.min(...hotel.rooms.map(r => r.price)).toLocaleString()} MMK{t.per_night}
                     </div>
                   </div>
                 </div>
-                <div className="p-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {hotel.rooms.map((room) => (
-                      <div key={room.type} className="flex items-center justify-between py-2.5 px-4 bg-white/3 rounded-xl border border-white/5">
-                        <span className="text-white/70 text-sm">{room.type}</span>
-                        <span className="text-amber-400 font-bold text-sm ml-4 whitespace-nowrap">
+                <div className="p-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {hotel.rooms.map(room => (
+                      <div key={room.type} className="flex items-center justify-between py-2 px-3 bg-surface-2 rounded-xl">
+                        <span className="text-secondary text-sm font-body">{room.type}</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-bold text-sm ml-3 whitespace-nowrap font-body">
                           {room.price.toLocaleString()}
                         </span>
                       </div>
@@ -248,10 +349,10 @@ export default async function DestinationPage({ params }: Props) {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
-            <Link href="/planner?destination=Ngwe Saung" className="btn-primary text-lg px-10 py-4 rounded-2xl font-bold">
-              <ArrowRight className="w-5 h-5" />
-              Find Hotels Within My Budget
+          <div className="mt-10 text-center">
+            <Link href="/planner"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/20 hover:-translate-y-0.5 font-body">
+              <Sparkles className="w-5 h-5" />{t.find_hotel}
             </Link>
           </div>
         </div>

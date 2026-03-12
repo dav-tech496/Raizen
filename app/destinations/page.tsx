@@ -148,16 +148,18 @@ export default function DestinationsPage() {
             </div>
           </div>
 
-          {/* Coming Soon cards */}
+          {/* Coming Soon cards — no photos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {t.soon.map((s, i) => (
-              <div key={i} className="glass-card rounded-2xl p-6 opacity-60 relative overflow-hidden">
+              <div key={i} className="glass-card rounded-2xl p-7 opacity-60 relative">
                 <div className="absolute top-4 right-4">
                   <span className="px-2.5 py-1 bg-surface-3 text-muted text-xs font-semibold rounded-full font-body border border-theme">
                     {t.coming_soon}
                   </span>
                 </div>
-                <MapPin className="w-5 h-5 text-muted mb-3" />
+                <div className="w-10 h-10 rounded-xl bg-surface-3 flex items-center justify-center mb-4">
+                  <MapPin className="w-5 h-5 text-muted" />
+                </div>
                 <h3 className="font-display text-xl font-bold text-primary mb-1">{s.name}</h3>
                 <p className="text-xs text-muted font-body mb-1">{s.region}</p>
                 <p className="text-sm text-secondary font-body">{s.tagline}</p>

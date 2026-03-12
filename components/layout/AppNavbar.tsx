@@ -15,18 +15,14 @@ export function AppNavbar() {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  // Close on outside click
   useEffect(() => {
     function handle(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false)
     }
     if (open) document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
   }, [open])
 
-  // Close on route change
   useEffect(() => { setOpen(false) }, [pathname])
 
   const navItems = [
@@ -40,34 +36,36 @@ export function AppNavbar() {
       {/* Main bar */}
       <nav className="bg-card/95 backdrop-blur-xl border-b border-card shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
+          {/* Logo — bigger */}
+          <Link href="/" className="flex-shrink-0 flex items-center">
             <Image
               src="/raizen-logo.png"
               alt="Raizen"
-              width={140}
-              height={44}
-              className="h-10 w-auto object-contain"
+              width={160}
+              height={52}
+              className="h-12 w-auto object-contain"
               priority
             />
           </Link>
 
-          {/* Hamburger — all screen sizes */}
+          {/* Hamburger — always visible on all screen sizes */}
           <button
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
-            className="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-2 border border-theme text-secondary hover:text-primary transition-colors"
+            className="flex items-center justify-center w-11 h-11 rounded-xl bg-surface-2 border border-theme text-secondary hover:text-primary hover:bg-surface-3 transition-all"
           >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {open
+              ? <X className="w-5 h-5" />
+              : <><span className="flex flex-col gap-1.5 w-5"><span className="block h-0.5 w-5 bg-current rounded-full" /><span className="block h-0.5 w-4 bg-current rounded-full" /><span className="block h-0.5 w-5 bg-current rounded-full" /></span></>
+            }
           </button>
         </div>
       </nav>
 
-      {/* Dropdown menu */}
+      {/* Dropdown */}
       <div className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="bg-card border-b border-card shadow-xl">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-1">
-            {/* Nav links */}
+        <div className="bg-card border-b border-card shadow-2xl">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 space-y-1">
             {navItems.map(item => {
               const Icon = item.icon
               const active = pathname === item.href
@@ -76,9 +74,7 @@ export function AppNavbar() {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors font-body ${
-                    active
-                      ? 'bg-blue-600/10 text-blue-600 dark:text-blue-400'
-                      : 'text-secondary hover:bg-surface-2 hover:text-primary'
+                    active ? 'bg-blue-600/10 text-blue-600 dark:text-blue-400' : 'text-secondary hover:bg-surface-2 hover:text-primary'
                   }`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
@@ -87,43 +83,40 @@ export function AppNavbar() {
               )
             })}
 
-            {/* Divider */}
-            <div className="h-px bg-surface-2 mx-1 my-2" />
+            <div className="h-px bg-border mx-1 my-1" />
 
             {/* Language + Theme row */}
-            <div className="flex items-center justify-between px-4 py-2">
-              {/* Language toggle */}
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between px-4 py-2.5">
+              <div className="flex items-center gap-3">
                 <span className="text-xs text-muted font-body">{lang === 'en' ? 'Language' : 'ဘာသာစကား'}</span>
                 <div className="flex items-center bg-surface-2 border border-theme rounded-full p-0.5">
                   <button
                     onClick={() => setLang('en')}
                     className={`px-3 py-1 rounded-full text-xs font-semibold transition-all font-body ${lang === 'en' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}
-                  >
-                    EN
-                  </button>
+                  >EN</button>
                   <button
                     onClick={() => setLang('mm')}
                     className={`px-3 py-1 rounded-full text-xs font-semibold transition-all font-body ${lang === 'mm' ? 'bg-blue-600 text-white shadow-sm' : 'text-secondary hover:text-primary'}`}
-                  >
-                    မြန်မာ
-                  </button>
+                  >မြန်မာ</button>
                 </div>
               </div>
 
-              {/* Theme toggle */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted font-body">{theme === 'dark' ? (lang === 'en' ? 'Dark' : 'မှောင်') : (lang === 'en' ? 'Light' : 'တောက်')}</span>
-                <button
-                  onClick={toggle}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border border-theme text-secondary hover:text-primary transition-colors"
-                >
+              <button
+                onClick={toggle}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border border-theme text-secondary hover:text-primary transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark'
+                  ? <Moon className="w-4 h-4" />
+                  : <Sun className="w-4 h-4" />
+                }
+                <span className="text-xs font-body">
                   {theme === 'dark'
-                    ? <><Moon className="w-4 h-4" /></>
-                    : <><Sun className="w-4 h-4" /></>
+                    ? (lang === 'en' ? 'Dark' : 'မှောင်')
+                    : (lang === 'en' ? 'Light' : 'တောက်')
                   }
-                </button>
-              </div>
+                </span>
+              </button>
             </div>
           </div>
         </div>
