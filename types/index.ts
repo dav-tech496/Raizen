@@ -14,11 +14,36 @@ export interface Hotel {
   destination_id: string
   name: string
   price_range: string | null
+  price_per_night_mmk: number | null
+  price_category: string | null
   address: string | null
   amenities: string[] | null
   rating: number | null
   contact: string | null
   verified: boolean
+  image_url: string | null
+  description: string | null
+  created_at: string
+}
+
+export interface HotelRoom {
+  id: string
+  hotel_id: string
+  room_type: string
+  price_per_night: number
+  capacity: number | null
+  created_at: string
+}
+
+export interface Transport {
+  id: string
+  destination_id: string
+  route: string
+  vehicle_type: string
+  price_regular: number
+  price_weekend: number | null
+  price_holiday: number | null
+  note: string | null
   created_at: string
 }
 
