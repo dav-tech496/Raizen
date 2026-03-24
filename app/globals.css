@@ -2,113 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
-
+/* ─── Range slider — cross-browser ─────────────────────────────── */
 @layer base {
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-  /* Light: soft grey */
-  :root {
-    --bg:      #f5f5f5;
-    --bg-2:    #ebebeb;
-    --bg-3:    #e0e0e0;
-    --border:  #d4d4d4;
-    --text:    #0a0a0a;
-    --text-2:  #404040;
-    --text-3:  #737373;
-    --card:    #ffffff;
-    --card-border: #e5e5e5;
-    --brand:   #2563eb;
+  input[type='range'] {
+    @apply h-1.5 rounded-full outline-none cursor-pointer appearance-none;
+    background: linear-gradient(
+      to right,
+      #2D6A4F 0%,
+      #2D6A4F var(--pct, 50%),
+      #CCCAC4 var(--pct, 50%),
+      #CCCAC4 100%
+    );
   }
-
-  /* Dark: slate */
-  .dark {
-    --bg:      #111827;
-    --bg-2:    #1f2937;
-    --bg-3:    #27374d;
-    --border:  #374151;
-    --text:    #f9fafb;
-    --text-2:  #d1d5db;
-    --text-3:  #6b7280;
-    --card:    #1f2937;
-    --card-border: #374151;
-    --brand:   #3b82f6;
+  input[type='range']::-webkit-slider-thumb {
+    @apply appearance-none w-[22px] h-[22px] rounded-full bg-white cursor-pointer;
+    border: 2.5px solid #2D6A4F;
+    box-shadow: 0 2px 8px rgba(45, 106, 79, 0.25);
   }
-
-  body {
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: var(--font-dm), 'DM Sans', sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  h1, h2, h3, h4, h5 {
-    font-family: var(--font-syne), 'Syne', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+  input[type='range']::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2.5px solid #2D6A4F;
+    box-shadow: 0 2px 8px rgba(45, 106, 79, 0.25);
+    cursor: pointer;
   }
 }
 
+/* ─── Scrollbar hide ────────────────────────────────────────────── */
 @layer utilities {
-  /* Theme vars as utilities */
-  .bg-surface   { background-color: var(--bg); }
-  .bg-surface-2 { background-color: var(--bg-2); }
-  .bg-surface-3 { background-color: var(--bg-3); }
-  .bg-card      { background-color: var(--card); }
-  .border-theme { border-color: var(--border); }
-  .border-card  { border-color: var(--card-border); }
-  .text-primary   { color: var(--text); }
-  .text-secondary { color: var(--text-2); }
-  .text-muted     { color: var(--text-3); }
-
-  /* Brand */
-  .bg-brand   { background-color: var(--brand); }
-  .text-brand { color: var(--brand); }
-
-  /* Glass card */
-  .glass-card {
-    background-color: var(--card);
-    border: 1px solid var(--card-border);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-  .dark .glass-card {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
+}
 
-  /* Gradient text */
-  .gradient-text {
-    background: linear-gradient(135deg, #2563eb, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .gradient-gold {
-    background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
-  }
-
-  /* Section label */
-  .section-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 14px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    background-color: var(--bg-2);
-    color: var(--text-3);
-    border: 1px solid var(--border);
-    font-family: var(--font-dm), 'DM Sans', sans-serif;
-  }
-
-  /* Staggered animation helpers */
-  .anim-delay-1 { animation-delay: 0.1s; }
-  .anim-delay-2 { animation-delay: 0.2s; }
-  .anim-delay-3 { animation-delay: 0.3s; }
-  .anim-delay-4 { animation-delay: 0.4s; }
-  .opacity-0-init { opacity: 0; }
+/* ─── Print styles ──────────────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
 }

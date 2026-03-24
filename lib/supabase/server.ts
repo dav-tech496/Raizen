@@ -1,8 +1,11 @@
+// lib/supabase/server.ts
+// Server-side Supabase client — use in Server Components, Route Handlers, Server Actions
+
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +21,7 @@ export function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // Called from Server Component — safe to ignore
+            // Called from a Server Component — cookies can't be set, ignore
           }
         },
       },

@@ -1,3 +1,6 @@
+// lib/supabase/client.ts
+// Browser-side Supabase client — use in Client Components only
+
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {

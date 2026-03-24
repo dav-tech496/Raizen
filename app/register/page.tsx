@@ -1,106 +1,111 @@
 'use client'
-import { useState } from 'react'
+
+import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { MapPin, Eye, EyeOff, CheckCircle, ArrowRight } from 'lucide-react'
+import { useLang } from '@/context/LangContext'
+import Navbar from '@/components/Navbar'
+import Drawer from '@/components/Drawer'
+import BottomNav from '@/components/BottomNav'
 
 export default function RegisterPage() {
-  const router = useRouter()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPass, setShowPass] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const { t } = useLang()
+  const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (password.length < 6) { setError('Password must be at least 6 characters'); return }
-    setLoading(true)
     setError(null)
+    if (password !== confirm) {
+      setError('Passwords do not match')
+      return
+    }
+    setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName } },
     })
-    if (error) { setError(error.message); setLoading(false); return }
-    setSuccess(true)
+    if (authError) {
+      setError(authError.message)
+      setLoading(false)
+    } else {
+      setSuccess(true)
+    }
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-surface">
-        <div className="text-center max-w-md">
-          <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-400" />
-          </div>
-          <h2 className="text-4xl font-bold mb-4">Check your email</h2>
-          <p className="text-white/50 text-lg mb-8 leading-relaxed">
-            We sent a confirmation link to <strong className="text-white">{email}</strong>.
-            Click it to activate your Raizen account.
-          </p>
-          <Link href="/login" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">
-            ← Back to Sign In
-          </Link>
-        </div>
+      <div className="max-w-[480px] mx-auto px-[18px] pt-20 text-center">
+        <div className="text-5xl mb-4">📧</div>
+        <h2 className="text-xl font-semibold text-ink mb-2">Check your email</h2>
+        <p className="text-sm text-ink2 font-light mb-6">
+          We sent a confirmation link to <strong>{email}</strong>
+        </p>
+        <Link href="/login" className="text-green font-medium text-sm">{t('signInLink')}</Link>
       </div>
     )
   }
 
+  const fields = [
+    { label: t('fullName'),        value: fullName,  set: setFullName,  type: 'text' },
+    { label: t('email'),           value: email,     set: setEmail,     type: 'email' },
+    { label: t('password'),        value: password,  set: setPassword,  type: 'password' },
+    { label: t('confirmPassword'), value: confirm,   set: setConfirm,   type: 'password' },
+  ]
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-20">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <Link href="/" className="inline-flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center">
-              <MapPin className="w-5 h-5 text-stone-900" />
-            </div>
-            <span className="text-xl font-bold gradient-text">Raizen</span>
-          </Link>
-          <h1 className="text-4xl font-bold mb-2">Create account</h1>
-          <p className="text-white/50">Free forever. Save unlimited itineraries.</p>
-        </div>
+    <>
+      <Navbar onMenuOpen={() => setDrawerOpen(true)} />
+      <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} user={null} />
 
-        <div className="glass-card rounded-3xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-white/60 mb-2 uppercase tracking-wider">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                className="input-field" placeholder="you@example.com" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-white/60 mb-2 uppercase tracking-wider">Password</label>
-              <div className="relative">
-                <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required
-                  className="input-field pr-12" placeholder="Min. 6 characters" />
-                <button type="button" onClick={() => setShowPass(!showPass)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
-                  {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
+      <main className="max-w-[480px] mx-auto px-[18px] pb-[90px] pt-8">
+        <h1 className="text-[26px] font-semibold text-ink tracking-[-0.5px] mb-2">{t('registerTitle')}</h1>
+        <p className="text-sm text-ink2 font-light mb-8">{t('registerSub')}</p>
 
-            {error && (
-              <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">{error}</div>
-            )}
-
-            <button type="submit" disabled={loading}
-              className="w-full py-4 gradient-gold text-stone-900 font-bold rounded-xl transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2">
-              {loading
-                ? <><div className="w-4 h-4 border-2 border-stone-900 border-t-transparent rounded-full animate-spin" />Creating account...</>
-                : <>Create Account <ArrowRight className="w-4 h-4" /></>}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-white/5 text-center">
-            <p className="text-white/40 text-sm">
-              Already have an account?{' '}
-              <Link href="/login" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">Sign in</Link>
-            </p>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md px-4 py-3 mb-6">
+            {error}
           </div>
-        </div>
-      </div>
-    </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {fields.map(({ label, value, set, type }) => (
+            <div key={label}>
+              <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-ink2 mb-[9px]">
+                {label}
+              </label>
+              <input
+                type={type} required value={value}
+                onChange={(e) => set(e.target.value)}
+                className="w-full px-4 py-[14px] text-sm text-ink bg-surface border-[1.5px] border-border2 rounded-md outline-none focus:border-green focus:shadow-[0_0_0_3px_rgba(45,106,79,.12)] transition-[border-color,box-shadow]"
+              />
+            </div>
+          ))}
+          <button
+            type="submit" disabled={loading}
+            className="w-full bg-green text-white text-[15px] font-semibold py-4 rounded-md shadow-[0_4px_18px_rgba(45,106,79,.32)] disabled:opacity-70 transition-opacity"
+          >
+            {loading ? t('registering') : t('registerBtn')}
+          </button>
+        </form>
+
+        <p className="text-sm text-ink2 text-center mt-6">
+          {t('haveAccount')}{' '}
+          <Link href="/login" className="text-green font-medium">{t('signInLink')}</Link>
+        </p>
+      </main>
+
+      <BottomNav />
+    </>
   )
 }

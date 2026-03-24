@@ -1,20 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { getSavedItineraries } from '@/lib/supabase/queries'
 import DashboardClient from './DashboardClient'
 
-export const dynamic = 'force-dynamic'
-
 export default async function DashboardPage() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) redirect('/login?redirectTo=/dashboard')
 
-  const { data: itineraries } = await supabase
-    .from('itineraries')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  return <DashboardClient user={user} initialItineraries={itineraries ?? []} />
+  const itineraries = await getSavedItineraries(user.id)
+  return <DashboardClient user={user} itineraries={itineraries} />
 }
