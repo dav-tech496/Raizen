@@ -1,6 +1,4 @@
-// lib/supabase/server.ts
-// Server-side Supabase client — use in Server Components, Route Handlers, Server Actions
-
+// lib/supabase/server.ts — server components, route handlers, server actions only
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -10,8 +8,8 @@ export async function createClient() {
 
   if (!url || !key) {
     throw new Error(
-      'Missing Supabase environment variables.\n' +
-      'Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables.'
+      'Missing Supabase env vars. Set NEXT_PUBLIC_SUPABASE_URL and ' +
+      'NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables.'
     )
   }
 
@@ -28,7 +26,7 @@ export async function createClient() {
             cookieStore.set(name, value, options)
           )
         } catch {
-          // Called from a Server Component — cookies can't be set here, ignore
+          // Server Component — cookies can't be set, safe to ignore
         }
       },
     },

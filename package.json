@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.47.0",
     "clsx": "^2.1.1",
@@ -32,6 +33,6 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "20.x"
   }
 }

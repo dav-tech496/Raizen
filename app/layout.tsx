@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   title: 'Raizen — Myanmar Travel Planner',
   description: 'Plan a complete Myanmar trip with verified hotels and real MMK bus ticket prices — free.',
   metadataBase: new URL('https://raizentourism.vercel.app'),
+  icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'Raizen — Myanmar Travel Planner',
     description: 'Real MMK prices. Matched hotels. Day-by-day plans. 100% free.',

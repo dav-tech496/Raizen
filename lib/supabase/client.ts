@@ -1,6 +1,4 @@
-// lib/supabase/client.ts
-// Browser-side Supabase client — use in Client Components only
-
+// lib/supabase/client.ts — browser-side only
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -9,9 +7,8 @@ export function createClient() {
 
   if (!url || !key) {
     throw new Error(
-      'Missing Supabase environment variables.\n' +
-      'Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file ' +
-      'and in the Vercel dashboard under Project → Settings → Environment Variables.'
+      'Missing Supabase env vars. Set NEXT_PUBLIC_SUPABASE_URL and ' +
+      'NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables.'
     )
   }
 
