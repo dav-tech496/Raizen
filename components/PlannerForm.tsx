@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useLang } from '@/context/LangContext'
-import { getBudgetTierLabel, formatMMK } from '@/lib/plannerLogic'
+import { getBudgetTierLabel } from '@/lib/plannerLogic'
 import type { Destination, PlannerFormValues, TravelerType, DepartureType } from '@/types'
 
 interface Props {
@@ -11,180 +11,218 @@ interface Props {
   isLoading: boolean
 }
 
-const TRAVELER_OPTIONS: { type: TravelerType; icon: string; en: string; mm: string }[] = [
-  { type: 'solo',   icon: '🧍', en: 'Solo',   mm: 'တစ်ဦးတည်း' },
-  { type: 'couple', icon: '👫', en: 'Couple', mm: 'စုံတွဲ' },
-  { type: 'family', icon: '👨‍👩‍👧', en: 'Family', mm: 'မိသားစု' },
-]
-
-const DEP_OPTIONS: { type: DepartureType; en: string; mm: string; price: number }[] = [
-  { type: 'regular', en: 'Weekday',         mm: 'နေ့ရက်',         price: 70_000 },
-  { type: 'weekend', en: 'Weekend',         mm: 'စနေ/တနင်္ဂနွေ', price: 80_000 },
-  { type: 'holiday', en: 'Holiday',         mm: 'ရုံးပိတ်ရက်',   price: 110_000 },
-]
+const MIN_BUDGET = 30_000
+const MAX_BUDGET = 1_000_000
+const DEFAULT_BUDGET = 200_000
 
 export default function PlannerForm({ destinations, onSubmit, isLoading }: Props) {
   const { lang, t } = useLang()
 
-  const [destId,   setDestId]   = useState(destinations[0]?.id   ?? '')
-  const [destSlug, setDestSlug] = useState(destinations[0]?.slug ?? 'ngwesaung')
-  const [days,     setDays]     = useState(3)
-  const [budget,   setBudget]   = useState(200_000)
-  const [traveler, setTraveler] = useState<TravelerType>('couple')
-  const [departure,setDeparture]= useState<DepartureType>('regular')
+  const [destinationId, setDestinationId] = useState(destinations[0]?.id ?? '')
+  const [days, setDays] = useState(3)
+  const [dailyBudget, setDailyBudget] = useState(DEFAULT_BUDGET)
+  const [travelerType, setTravelerType] = useState<TravelerType>('solo')
+  const [departureType, setDepartureType] = useState<DepartureType>('regular')
 
-  const daysPercent   = ((days - 1)          / (7 - 1))                * 100
-  const budgetPercent = ((budget - 100_000)  / (800_000 - 100_000))   * 100
-  const tier          = getBudgetTierLabel(budget)
+  // Slider fill percentage CSS var
+  const pct = Math.round(
+    ((dailyBudget - MIN_BUDGET) / (MAX_BUDGET - MIN_BUDGET)) * 100
+  )
 
-  const handleDestChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const dest = destinations.find((d) => d.id === e.target.value)
-    if (dest) { setDestId(dest.id); setDestSlug(dest.slug) }
-  }, [destinations])
+  // Sync CSS variable for range track fill
+  useEffect(() => {
+    const el = document.getElementById('budget-slider') as HTMLInputElement | null
+    if (el) el.style.setProperty('--pct', `${pct}%`)
+  }, [pct])
 
-  const handleSubmit = () => {
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const dest = destinations.find((d) => d.id === destinationId)
+    if (!dest) return
     onSubmit({
-      destinationId:   destId,
-      destinationSlug: destSlug,
+      destinationId,
+      destinationSlug: dest.slug,
       days,
-      dailyBudget:     budget,
-      travelerType:    traveler,
-      travelerCount:   traveler === 'solo' ? 1 : traveler === 'couple' ? 2 : 4,
-      departureType:   departure,
+      dailyBudget,
+      travelerType,
+      travelerCount: travelerType === 'solo' ? 1 : travelerType === 'couple' ? 2 : 4,
+      departureType,
     })
   }
 
-  const inputCls =
-    'w-full px-4 py-[14px] text-sm text-ink bg-surface border-[1.5px] border-border2 rounded-md outline-none appearance-none focus:border-green focus:shadow-[0_0_0_3px_rgba(45,106,79,.12)] transition-[border-color,box-shadow]'
+  const tierLabel = getBudgetTierLabel(dailyBudget)
+  const tierText = lang === 'mm' ? tierLabel.mm : tierLabel.en
 
   return (
-    <div className="px-[18px] pt-6">
+    <form onSubmit={handleSubmit} className="px-[18px] pt-6 pb-2 flex flex-col gap-6">
 
       {/* Destination */}
-      <div className="mb-[22px]">
-        <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-ink2 mb-[9px]">
+      <div>
+        <label className="block text-xs font-semibold tracking-[0.06em] uppercase text-ink2 mb-[10px]">
           {t('destination')}
         </label>
-        <div className="relative">
-          <select value={destId} onChange={handleDestChange} className={inputCls}>
-            {destinations.map((d) => (
-              <option key={d.id} value={d.id}>{d.name}</option>
-            ))}
-            <option disabled>Bagan ({lang === 'mm' ? 'မကြာမီ' : 'Coming Soon'})</option>
-            <option disabled>Inle Lake ({lang === 'mm' ? 'မကြာမီ' : 'Coming Soon'})</option>
-          </select>
-          <div className="pointer-events-none absolute right-[14px] top-1/2 -translate-y-1/2 border-l-[5px] border-r-[5px] border-t-[5px] border-l-transparent border-r-transparent border-t-ink3" />
-        </div>
-      </div>
-
-      {/* Days slider */}
-      <div className="mb-[22px]">
-        <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-ink2 mb-[9px]">
-          {t('numberOfDays')}
-        </label>
-        <div className="flex items-center gap-3 mb-[10px]">
-          <input
-            type="range" min={1} max={7} step={1} value={days}
-            onChange={(e) => setDays(Number(e.target.value))}
-            style={{ '--pct': `${daysPercent}%` } as React.CSSProperties}
-            className="flex-1"
-          />
-          <div className="text-lg font-semibold text-green min-w-[70px] text-right tracking-[-0.3px]">
-            <strong>{days}</strong>{' '}
-            <span className="text-xs font-normal text-ink3">
-              {lang === 'mm' ? 'ရက်' : days === 1 ? 'day' : 'days'}
-            </span>
-          </div>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-[11px] text-ink3">{lang === 'mm' ? '၁ ရက်' : '1 day'}</span>
-          <span className="text-[11px] text-ink3">{lang === 'mm' ? '၇ ရက်' : '7 days'}</span>
-        </div>
-      </div>
-
-      {/* Budget slider */}
-      <div className="mb-[22px]">
-        <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-ink2 mb-[9px]">
-          {t('dailyBudget')}
-        </label>
-        <div className="flex items-center gap-3 mb-[10px]">
-          <input
-            type="range" min={100_000} max={800_000} step={10_000} value={budget}
-            onChange={(e) => setBudget(Number(e.target.value))}
-            style={{ '--pct': `${budgetPercent}%` } as React.CSSProperties}
-            className="flex-1"
-          />
-          <div className="text-[14px] font-semibold text-green min-w-[100px] text-right tracking-[-0.3px]">
-            {formatMMK(budget)}
-          </div>
-        </div>
-        <div className="flex justify-between mb-[10px]">
-          <span className="text-[11px] text-ink3">100K MMK</span>
-          <span className="text-[11px] text-ink3">800K MMK</span>
-        </div>
-        <div className="flex items-center justify-between bg-surface2 rounded-sm px-[14px] py-[10px] border border-border">
-          <span className="text-xs text-ink3">{t('budgetTier')}</span>
-          <span className="text-[13px] font-semibold text-green">
-            {lang === 'mm' ? tier.mm : tier.en}
-          </span>
-        </div>
-      </div>
-
-      {/* Traveler */}
-      <div className="mb-[22px]">
-        <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-ink2 mb-[9px]">
-          {t('travelingAs')}
-        </label>
-        <div className="grid grid-cols-3 gap-2">
-          {TRAVELER_OPTIONS.map((opt) => (
+        <div className="grid grid-cols-1 gap-[9px]">
+          {destinations.map((d) => (
             <button
-              key={opt.type}
-              onClick={() => setTraveler(opt.type)}
-              className={`border-[1.5px] rounded-md py-[14px] px-2 text-center transition-all ${
-                traveler === opt.type ? 'border-green bg-green-pale' : 'border-border2 bg-surface'
+              key={d.id}
+              type="button"
+              onClick={() => setDestinationId(d.id)}
+              className={`flex items-center gap-3 px-4 py-[13px] rounded-md border text-left transition-all ${
+                destinationId === d.id
+                  ? 'border-green bg-green-pale shadow-[0_0_0_2px_rgba(45,106,79,.15)]'
+                  : 'border-border bg-surface'
               }`}
             >
-              <div className="text-[22px] mb-[6px]">{opt.icon}</div>
-              <div className={`text-xs font-medium ${traveler === opt.type ? 'text-green' : 'text-ink2'}`}>
-                {lang === 'mm' ? opt.mm : opt.en}
-              </div>
+              <div
+                className={`w-[10px] h-[10px] rounded-full border-2 flex-shrink-0 transition-colors ${
+                  destinationId === d.id ? 'border-green bg-green' : 'border-border2 bg-surface'
+                }`}
+              />
+              <span className={`text-[15px] font-medium ${destinationId === d.id ? 'text-green' : 'text-ink'}`}>
+                {d.name}
+              </span>
+              {destinationId === d.id && (
+                <span className="ml-auto text-[10px] font-semibold bg-green text-white rounded-full px-[9px] py-[3px]">
+                  {t('availableNow')}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Number of days */}
+      <div>
+        <label className="block text-xs font-semibold tracking-[0.06em] uppercase text-ink2 mb-[10px]">
+          {t('numberOfDays')}
+        </label>
+        <div className="flex gap-[9px]">
+          {[2, 3, 4, 5, 7].map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDays(d)}
+              className={`flex-1 py-[12px] rounded-md text-[15px] font-semibold border transition-all ${
+                days === d
+                  ? 'bg-green text-white border-green shadow-sm'
+                  : 'bg-surface text-ink border-border hover:border-green/40'
+              }`}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-ink3 mt-[8px] font-light">
+          {days} {lang === 'mm' ? 'ရက် ရွေးချယ်ထားသည်' : `${days === 1 ? 'day' : 'days'} selected`}
+        </p>
+      </div>
+
+      {/* Daily budget slider */}
+      <div>
+        <div className="flex items-center justify-between mb-[10px]">
+          <label className="text-xs font-semibold tracking-[0.06em] uppercase text-ink2">
+            {t('dailyBudget')}
+          </label>
+          <span className="text-xs font-medium bg-green-pale text-green px-[10px] py-[4px] rounded-full">
+            {tierText}
+          </span>
+        </div>
+
+        <div className="bg-surface border border-border rounded-md px-4 py-[14px] mb-3 text-center">
+          <span className="text-[28px] font-bold text-ink tracking-[-0.5px]">
+            {dailyBudget.toLocaleString('en-US')}
+          </span>
+          <span className="text-sm text-ink3 ml-[6px]">MMK / {lang === 'mm' ? 'ရက်' : 'day'}</span>
+        </div>
+
+        <input
+          id="budget-slider"
+          type="range"
+          min={MIN_BUDGET}
+          max={MAX_BUDGET}
+          step={10_000}
+          value={dailyBudget}
+          onChange={(e) => setDailyBudget(Number(e.target.value))}
+          className="w-full"
+          style={{ ['--pct' as string]: `${pct}%` }}
+        />
+
+        <div className="flex justify-between mt-[6px]">
+          <span className="text-[11px] text-ink3 font-light">30K MMK</span>
+          <span className="text-[11px] text-ink3 font-light">1,000K MMK</span>
+        </div>
+      </div>
+
+      {/* Traveling as */}
+      <div>
+        <label className="block text-xs font-semibold tracking-[0.06em] uppercase text-ink2 mb-[10px]">
+          {t('travelingAs')}
+        </label>
+        <div className="grid grid-cols-3 gap-[9px]">
+          {([
+            ['solo',   '🧍', 'solo'],
+            ['couple', '👫', 'couple'],
+            ['family', '👨‍👩‍👧‍👦', 'family'],
+          ] as const).map(([val, emoji, labelKey]) => (
+            <button
+              key={val}
+              type="button"
+              onClick={() => setTravelerType(val)}
+              className={`flex flex-col items-center gap-[6px] py-[14px] rounded-md border text-[13px] font-medium transition-all ${
+                travelerType === val
+                  ? 'bg-green-pale border-green text-green'
+                  : 'bg-surface border-border text-ink2 hover:border-green/40'
+              }`}
+            >
+              <span className="text-[22px]">{emoji}</span>
+              {t(labelKey)}
             </button>
           ))}
         </div>
       </div>
 
       {/* Departure day */}
-      <div className="mb-[22px]">
-        <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-ink2 mb-[9px]">
+      <div>
+        <label className="block text-xs font-semibold tracking-[0.06em] uppercase text-ink2 mb-[10px]">
           {t('departureDay')}
         </label>
-        <div className="grid grid-cols-3 gap-2">
-          {DEP_OPTIONS.map((opt) => (
+        <div className="grid grid-cols-3 gap-[9px]">
+          {([
+            ['regular', 'weekday'],
+            ['weekend', 'weekend'],
+            ['holiday', 'holiday'],
+          ] as const).map(([val, labelKey]) => (
             <button
-              key={opt.type}
-              onClick={() => setDeparture(opt.type)}
-              className={`border-[1.5px] rounded-md py-[11px] px-2 text-center text-sm transition-all ${
-                departure === opt.type
-                  ? 'border-green bg-green-pale text-green font-medium'
-                  : 'border-border2 bg-surface text-ink2'
+              key={val}
+              type="button"
+              onClick={() => setDepartureType(val)}
+              className={`py-[12px] rounded-md border text-[13px] font-medium transition-all ${
+                departureType === val
+                  ? 'bg-green-pale border-green text-green'
+                  : 'bg-surface border-border text-ink2 hover:border-green/40'
               }`}
             >
-              {lang === 'mm' ? opt.mm : opt.en}
-              <br />
-              <span className="text-[10px] opacity-70">{formatMMK(opt.price)} MMK</span>
+              {t(labelKey)}
             </button>
           ))}
         </div>
+        {departureType !== 'regular' && (
+          <p className="text-[11px] text-amber mt-[7px] font-light">
+            {lang === 'mm'
+              ? 'မှတ်ချက်: စနေ/တနင်္ဂနွေနှင့် ရုံးပိတ်ရက်တွင် ဘတ်ကားခ ပိုများနိုင်ပါသည်'
+              : 'Note: Bus prices may be higher on weekends and holidays.'}
+          </p>
+        )}
       </div>
 
-      {/* Travel style — coming soon */}
-      <div className="mb-[22px]">
-        <label className="block text-xs font-semibold tracking-[0.05em] uppercase text-ink2 mb-[9px]">
+      {/* Travel style (coming soon) */}
+      <div className="opacity-60">
+        <label className="block text-xs font-semibold tracking-[0.06em] uppercase text-ink2 mb-[10px]">
           {t('travelStyle')}
         </label>
-        <div className="flex items-center justify-between bg-surface2 border-[1.5px] border-dashed border-border2 rounded-md px-4 py-4">
-          <span className="text-sm font-medium text-ink2">{t('travelStyleSoon')}</span>
-          <span className="text-[10px] font-medium bg-amber-pale text-[#92400E] rounded-full px-[11px] py-[3px]">
+        <div className="bg-surface border border-border rounded-md px-4 py-[13px] flex items-center justify-between">
+          <span className="text-[13px] text-ink3 font-light">{t('travelStyleSoon')}</span>
+          <span className="text-[10px] font-semibold bg-amber-pale text-[#92400E] rounded-full px-[10px] py-[3px]">
             {t('soon')}
           </span>
         </div>
@@ -192,16 +230,12 @@ export default function PlannerForm({ destinations, onSubmit, isLoading }: Props
 
       {/* Submit */}
       <button
-        onClick={handleSubmit}
-        disabled={isLoading}
-        className="w-full flex items-center justify-center gap-2 bg-green text-white text-[15px] font-semibold py-4 rounded-md shadow-[0_4px_18px_rgba(45,106,79,.32)] transition-transform active:scale-[0.98] disabled:opacity-70 mt-1"
+        type="submit"
+        disabled={isLoading || !destinationId}
+        className="w-full bg-green text-white text-[15px] font-semibold py-4 rounded-md shadow-[0_4px_18px_rgba(45,106,79,.32)] disabled:opacity-60 transition-opacity active:opacity-80 mt-1"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
-          <path d="M9 11l3 3L22 4" />
-          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-        </svg>
         {isLoading ? '…' : t('showMyPlan')}
       </button>
-    </div>
+    </form>
   )
 }

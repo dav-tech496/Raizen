@@ -11,7 +11,6 @@ import LoadingOverlay from '@/components/LoadingOverlay'
 import { useLang } from '@/context/LangContext'
 import { buildPlanResult } from '@/lib/plannerLogic'
 import { createClient } from '@/lib/supabase/client'
-import { saveItinerary } from '@/lib/supabase/queries'
 import type {
   Destination,
   Hotel,
@@ -84,10 +83,10 @@ export default function PlannerClient({ destinations, hotels, transports, templa
 
   async function handleSave() {
     if (!result) return
+
+    // Check auth via browser client (no server cookies needed)
     const supabase = createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
       router.push('/login?redirectTo=/planner')
@@ -96,15 +95,26 @@ export default function PlannerClient({ destinations, hotels, transports, templa
 
     setIsSaving(true)
     try {
-      await saveItinerary(user.id, {
-        destination: result.destinationName,
-        days: result.days,
-        budget: result.busTicket.pricePerPax,
-        title: `${result.days}-Day ${result.destinationName} Trip`,
-        ai_response: result as object,
+      // Use the API route so server cookies are handled server-side
+      const res = await fetch('/api/itineraries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destination: result.destinationName,
+          days: result.days,
+          budget: result.busTicket.pricePerPax,
+          title: `${result.days}-Day ${result.destinationName} Trip`,
+          ai_response: result,
+        }),
       })
+
+      if (!res.ok) {
+        const { error } = await res.json()
+        throw new Error(error ?? 'Failed to save')
+      }
+
       alert(lang === 'mm' ? 'ခရီးစဉ်သိမ်းဆည်းပြီးပါပြီ!' : 'Itinerary saved successfully!')
-    } catch {
+    } catch (err) {
       alert(
         lang === 'mm'
           ? 'ဖြစ်မလာပါ — နောက်မှထပ်ကြိုးစားပါ'

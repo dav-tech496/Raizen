@@ -1,100 +1,88 @@
-# 🇲🇲 Raizen — Myanmar Travel Planner
+# Raizen — Myanmar Travel Planner
 
-Production-ready Next.js travel SaaS — mobile-first, bilingual (EN/မြန်မာ), real MMK pricing.
+A Next.js 14 (App Router) travel planner for Myanmar destinations with Supabase backend.
 
-## Stack
-
-- **Framework**: Next.js 14 (App Router) + TypeScript
-- **Styling**: Tailwind CSS (DM Sans + Playfair Display)
-- **Database**: Supabase (PostgreSQL + RLS)
-- **Auth**: Supabase Auth (email/password)
-- **PDF**: jsPDF (proper A4 generation, no print dialog)
-- **Deployment**: Vercel
-
-## Quick Start
+## 🚀 Quick Start (Local)
 
 ```bash
+# 1. Install dependencies
 npm install
-cp .env.local .env.local   # fill in your Supabase keys
+
+# 2. Set up environment variables
+cp .env.example .env.local
+# → Edit .env.local and fill in your Supabase keys
+
+# 3. Run dev server
 npm run dev
 ```
 
-## Environment Variables
+Open [http://localhost:3000](http://localhost:3000)
 
-Add these to `.env.local` and to Vercel:
+## 🔑 Environment Variables
+
+| Variable | Where to find it |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Project → Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Dashboard → Project → Settings → API → `anon public` key |
+
+**For Vercel deployment:**
+Go to **Vercel → Your Project → Settings → Environment Variables** and add both variables above.
+
+## 🏗️ Project Structure
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://wnzoxfacvypcnrmsvnpt.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+app/
+  page.tsx                    # Home (SSR, revalidates hourly)
+  layout.tsx                  # Root layout + fonts + LangProvider
+  login/
+    page.tsx                  # Suspense wrapper (required for useSearchParams)
+    LoginForm.tsx             # Actual login form client component
+  register/page.tsx           # Registration form
+  dashboard/page.tsx          # Protected — redirects if not logged in
+  destinations/
+    page.tsx                  # Destinations list (SSR)
+    [slug]/page.tsx           # Destination detail (SSR, async params)
+  planner/page.tsx            # Trip planner (SSR data fetch → client form)
+  api/itineraries/route.ts    # POST route for saving itineraries
+
+components/
+  Navbar.tsx                  # Sticky top nav with hamburger
+  Drawer.tsx                  # Slide-in menu with nav + auth + language
+  BottomNav.tsx               # Mobile bottom navigation
+  Hero.tsx                    # Home page hero section
+  FeaturedCard.tsx            # Featured destination card
+  PlannerForm.tsx             # Trip planner form
+  ResultCard.tsx              # Trip result display + PDF download
+  LoadingOverlay.tsx          # Full-screen loading overlay
+
+lib/
+  supabase/client.ts          # Browser Supabase client
+  supabase/server.ts          # Server Supabase client (cookies)
+  supabase/queries.ts         # All DB query functions
+  plannerLogic.ts             # Pure business logic (no React/Supabase)
+  pdfGenerator.ts             # jsPDF itinerary generator
+  utils.ts                    # cn() + formatMMK()
+
+context/
+  LangContext.tsx             # EN/MM language context + translations
+
+types/
+  index.ts                    # All TypeScript types
 ```
 
-Get your keys from:
-https://supabase.com/dashboard/project/wnzoxfacvypcnrmsvnpt/settings/api
+## 🛠️ Deployment (Vercel)
 
-## File Structure
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables (see above)
+4. Deploy — **no build overrides needed**
 
-```
-raizen/
-├── app/
-│   ├── layout.tsx              # Root layout + fonts + LangProvider
-│   ├── globals.css             # Tailwind base + slider CSS + print
-│   ├── page.tsx                # Home (Server Component — fetches destinations)
-│   ├── HomeClient.tsx          # Home UI (Client Component)
-│   ├── destinations/
-│   │   ├── page.tsx            # Destinations list (Server)
-│   │   ├── DestinationsClient.tsx
-│   │   └── [slug]/
-│   │       ├── page.tsx        # Destination detail (Server)
-│   │       └── DestinationDetailClient.tsx
-│   ├── planner/
-│   │   ├── page.tsx            # Planner (Server — loads all data)
-│   │   └── PlannerClient.tsx   # Planner UI + result
-│   ├── login/page.tsx
-│   ├── register/page.tsx
-│   └── dashboard/
-│       ├── page.tsx            # Protected — redirects if no session
-│       └── DashboardClient.tsx
-├── components/
-│   ├── Navbar.tsx              # Sticky top bar + hamburger
-│   ├── Drawer.tsx              # Slide-in nav + language switcher + auth
-│   ├── BottomNav.tsx           # Fixed bottom tab navigation
-│   ├── Hero.tsx                # Home hero section
-│   ├── FeaturedCard.tsx        # Featured destination card
-│   ├── PlannerForm.tsx         # Full planner form with sliders
-│   ├── ResultCard.tsx          # Plan result — bus, hotels, days, PDF
-│   └── LoadingOverlay.tsx      # Full-screen loading spinner
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts           # Browser Supabase client
-│   │   ├── server.ts           # Server Supabase client
-│   │   └── queries.ts          # All DB functions (typed)
-│   ├── plannerLogic.ts         # All business logic (pure functions)
-│   ├── pdfGenerator.ts         # jsPDF A4 itinerary generator
-│   └── utils.ts                # cn(), formatMMK()
-├── context/
-│   └── LangContext.tsx         # EN/MM language context + full dictionary
-├── types/
-│   └── index.ts                # All TypeScript interfaces
-├── middleware.ts               # Auth guard for /dashboard
-├── next.config.js
-├── tailwind.config.ts
-├── tsconfig.json
-└── package.json
-```
+## 🗄️ Supabase Tables Required
 
-## Deploy to Vercel
-
-1. Push this repo to GitHub
-2. Import in Vercel → https://vercel.com/new
-3. Add environment variables (same as `.env.local`)
-4. Deploy → done
-
-## Supabase Tables
-
-- `destinations` — destination data
-- `hotels` + `hotel_rooms` — hotel + room pricing
-- `transport` — bus ticket prices (regular/weekend/holiday)
-- `itinerary_templates` — day-by-day plan content (EN + MM)
-- `profiles` — user profiles (auto-created on signup)
-- `itineraries` — saved user itineraries (RLS protected)
+- `destinations` — id, name, slug, description, image_url, region, highlights, created_at
+- `hotels` — id, destination_id, name, price_category, verified, ...
+- `hotel_rooms` — id, hotel_id, room_type, price_per_night, capacity
+- `transport` — id, destination_id, route, vehicle_type, price_regular, price_weekend, price_holiday, note
+- `itinerary_templates` — id, destination_id, day_number, title_en, title_mm, activities (jsonb)
+- `itineraries` — id, user_id, destination, days, budget, title, ai_response (jsonb), created_at
+- `profiles` — id, full_name, preferred_lang, created_at, updated_at
