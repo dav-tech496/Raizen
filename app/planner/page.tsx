@@ -6,6 +6,9 @@ import {
 } from '@/lib/supabase/queries'
 import PlannerClient from './PlannerClient'
 
+// Revalidate every 60 seconds — price changes in Supabase appear within 1 minute
+export const revalidate = 60
+
 export default async function PlannerPage() {
   const destinations = await getDestinations()
   const ngweSaung = destinations.find((d) => d.slug === 'ngwesaung') ?? destinations[0]

@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation'
 import { getDestinationBySlug, getHotelsByDestination } from '@/lib/supabase/queries'
 import DestinationDetailClient from './DestinationDetailClient'
 
-// Next.js 14+ requires params to be awaited in async server components
+// Revalidate every 60 seconds — price/hotel edits in Supabase appear within 1 minute
+export const revalidate = 60
+
 interface Props {
   params: Promise<{ slug: string }>
 }
