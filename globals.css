@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Range slider — cross-browser ─────────────────────────────── */
+@layer base {
+  input[type='range'] {
+    @apply h-1.5 rounded-full outline-none cursor-pointer appearance-none;
+    background: linear-gradient(
+      to right,
+      #B91C1C 0%,
+      #B91C1C var(--pct, 50%),
+      #D4C8C8 var(--pct, 50%),
+      #D4C8C8 100%
+    );
+  }
+  input[type='range']::-webkit-slider-thumb {
+    @apply appearance-none w-[22px] h-[22px] rounded-full bg-white cursor-pointer;
+    border: 2.5px solid #B91C1C;
+    box-shadow: 0 2px 8px rgba(185, 28, 28, 0.25);
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2.5px solid #B91C1C;
+    box-shadow: 0 2px 8px rgba(185, 28, 28, 0.25);
+    cursor: pointer;
+  }
+}
+
+/* ─── Scrollbar hide ────────────────────────────────────────────── */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ─── Print styles ──────────────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
+}
