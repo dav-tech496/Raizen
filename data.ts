@@ -3,7 +3,7 @@
  * Use these functions in Server Components, Route Handlers, and Server Actions only.
  */
 
-import { createServerClient } from "@/lib/supabase-server";
+import { createServerClient } from "@/lib/supabase/server";
 import type {
   Destination,
   Hotel,
