@@ -1,21 +1,20 @@
-// lib/supabase/server.ts — server components, route handlers, server actions only
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+// lib/supabase-server.ts
+import { createServerClient as createSSRClient, type CookieOptions } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from 'next/headers'
 
+// For Server Components, Route Handlers, Server Actions (uses cookies/session)
 export async function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
   if (!url || !key) {
     throw new Error(
       'Missing Supabase env vars. Set NEXT_PUBLIC_SUPABASE_URL and ' +
       'NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables.'
     )
   }
-
   const cookieStore = await cookies()
-
-  return createServerClient(url, key, {
+  return createSSRClient(url, key, {
     cookies: {
       getAll() {
         return cookieStore.getAll()
@@ -31,4 +30,17 @@ export async function createClient() {
       },
     },
   })
+}
+
+// For data fetching in data.ts (uses service role key, bypasses RLS)
+export function createServerClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  return createSupabaseClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
 }
