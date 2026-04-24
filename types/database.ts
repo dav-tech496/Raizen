@@ -148,12 +148,13 @@ export interface Itinerary {
   day_number: number;
   activities: ItineraryActivity[];
   image_url?: string | null;
-  duration_days?: number | null; 
-  price_per_pax?: number | null; 
+  duration_days?: number | null;
+  price?: number | null;       
+  slug?: string | null;       
+  price_per_pax?: number | null;
   price_from?: number | null;
   days?: number | null;
 }
-
 export interface Station {
   id: string;
   name: string;
