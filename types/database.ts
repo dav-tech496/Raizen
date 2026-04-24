@@ -138,3 +138,17 @@ export interface PlanResult {
   totalCost: number
   cheapestHotelTotal: number
 }
+
+export interface Itinerary {
+  id: string;
+  destination_id: string;
+  title: string;
+  day_number: number;
+  activities: ItineraryActivity[];
+}
+
+export interface Station {
+  id: string;
+  name: string;
+  location: string | null;
+}
