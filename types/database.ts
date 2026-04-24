@@ -7,6 +7,8 @@ export interface Destination {
   description: string | null
   image_url: string | null
   region: string | null
+  country?: string | null     
+  price_from?: number | null  
   highlights: string[] | null
   created_at: string
 }
