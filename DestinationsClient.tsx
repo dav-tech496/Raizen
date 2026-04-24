@@ -8,7 +8,7 @@ import Drawer from '@/components/Drawer'
 import BottomNav from '@/components/BottomNav'
 import EmptyState from '@/components/EmptyState'
 import { useLang } from '@/context/LangContext'
-import type { Destination } from '@/types'
+import type { Destination } from '@/types/database'
 
 interface Props { destinations: Destination[] }
 
