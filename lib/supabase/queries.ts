@@ -2,7 +2,7 @@
 // All Supabase data-fetching functions — server-side only.
 // Each function returns typed data or throws a descriptive error.
 
-import { createClient } from './server'
+import { createServerClient as createClient } from './server';
 import type {
   Destination,
   Hotel,
