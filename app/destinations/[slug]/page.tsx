@@ -1,11 +1,10 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-// Tell Next.js which slugs exist at build time
 export async function generateStaticParams() {
   return [{ slug: 'ngwesaung' }, { slug: 'chaung-thar' }];
 }
@@ -105,8 +104,10 @@ export default async function DestinationPage({ params }: { params: { slug: stri
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
@@ -212,9 +213,10 @@ export default async function DestinationPage({ params }: { params: { slug: stri
           <div className="space-y-4">
             {hotels.map((hotel) => {
               const rooms = hotel.hotel_rooms ?? [];
-              const minPrice = rooms.length > 0
-                ? Math.min(...rooms.map((r) => r.price_per_night))
-                : hotel.price_per_night_mmk;
+              const minPrice =
+                rooms.length > 0
+                  ? Math.min(...rooms.map((r) => r.price_per_night))
+                  : hotel.price_per_night_mmk;
               return (
                 <div key={hotel.id} className="border border-gray-200 dark:border-gray-800 rounded-2xl p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                   <div className="flex items-start justify-between mb-3 gap-2">
