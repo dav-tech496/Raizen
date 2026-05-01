@@ -1,5 +1,4 @@
-app/ destination /  page.tsx
--import Image from 'next/image';
+import Image from 'next/image';
 import Link from 'next/link';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
