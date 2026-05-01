@@ -19,19 +19,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export const revalidate = 3600;
 
-// ─── Static config per destination ───────────────────────────────────────────
-const DESTINATION_CONFIG: Record<
-  string,
-  {
-    heroImage: string;
-    galleryImages: { src: string; alt: string }[];
-    tagline: string;
-    bodyText: string[];
-    badgeTags: string[];
-    bestTime: string;
-    planLabel: string;
-  }
-> = {
+const DESTINATION_CONFIG: Record<string, {
+  heroImage: string;
+  galleryImages: { src: string; alt: string }[];
+  tagline: string;
+  bodyText: string[];
+  badgeTags: string[];
+  bestTime: string;
+  planLabel: string;
+}> = {
   ngwesaung: {
     heroImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=90&auto=format&fit=crop',
     galleryImages: [
@@ -75,7 +71,6 @@ const DESTINATION_CONFIG: Record<
 interface HotelRoom { room_type: string; price_per_night: number; capacity: number | null; }
 interface Hotel { id: string; name: string; price_category: string | null; price_per_night_mmk: number | null; hotel_rooms: HotelRoom[]; }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function DestinationPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const config = DESTINATION_CONFIG[slug];
@@ -108,26 +103,26 @@ export default async function DestinationPage({ params }: { params: { slug: stri
   const hotels: Hotel[] = (hotelsRaw ?? []) as Hotel[];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-24">
+    <div className="min-h-screen bg-rose-50 dark:bg-gray-950 pb-28">
 
-      {/* ── Hero ── */}
-      <div className="relative h-56 w-full overflow-hidden">
+      {/* Hero */}
+      <div className="relative h-64 w-full overflow-hidden">
         <Image src={config.heroImage} alt={destination.name} fill priority className="object-cover" sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
         {/* Back button */}
         <Link
           href="/destinations"
-          className="absolute top-4 left-4 bg-black/40 backdrop-blur-sm text-white rounded-full p-2 hover:bg-black/60 transition-colors"
+          className="absolute top-4 left-4 bg-black/40 backdrop-blur-sm text-white rounded-full p-2.5 hover:bg-black/60 transition-colors"
           aria-label="Back"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-5 h-5">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
         </Link>
         <div className="absolute bottom-4 left-4 text-white">
           <p className="text-xs opacity-80 mb-0.5">{destination.region}</p>
           <h1 className="text-2xl font-bold">{destination.name}</h1>
-          <div className="flex gap-2 mt-1.5">
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
             {config.badgeTags.slice(0, 3).map((tag) => (
               <span key={tag} className="text-[10px] bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full">{tag}</span>
             ))}
@@ -135,15 +130,14 @@ export default async function DestinationPage({ params }: { params: { slug: stri
         </div>
       </div>
 
-      <div className="px-4 py-5 space-y-5">
+      <div className="px-4 py-5 space-y-4">
 
-        {/* ── About ── */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+        {/* About */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <h2 className="font-bold text-gray-900 dark:text-white text-base mb-2">{config.tagline}</h2>
           {config.bodyText.map((para, i) => (
             <p key={i} className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-2">{para}</p>
           ))}
-          {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {config.badgeTags.map((tag) => (
               <span key={tag} className="text-[11px] bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-2.5 py-1 rounded-full font-medium">
@@ -151,7 +145,6 @@ export default async function DestinationPage({ params }: { params: { slug: stri
               </span>
             ))}
           </div>
-          {/* Best time */}
           <div className="mt-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl px-3 py-2.5 flex items-center gap-2">
             <span className="text-lg">☀️</span>
             <div>
@@ -161,61 +154,53 @@ export default async function DestinationPage({ params }: { params: { slug: stri
           </div>
         </div>
 
-        {/* ── Gallery ── */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+        {/* Gallery */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <h2 className="font-bold text-gray-900 dark:text-white text-base mb-3">Gallery</h2>
           <div className="grid grid-cols-3 gap-2">
             {config.galleryImages.map((img) => (
               <div key={img.src} className="relative aspect-square rounded-xl overflow-hidden">
-                <Image
-                  src={img.src} alt={img.alt} fill
-                  className="object-cover hover:scale-105 transition-transform duration-300"
-                  sizes="33vw"
-                />
+                <Image src={img.src} alt={img.alt} fill className="object-cover hover:scale-105 transition-transform duration-300" sizes="33vw" />
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── Hotels ── */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+        {/* Hotels */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <h2 className="font-bold text-gray-900 dark:text-white text-base">Hotels &amp; Pricing</h2>
-            <span className="text-[11px] text-gray-400 dark:text-gray-500">MMK / night</span>
+            <span className="text-[11px] text-gray-400">MMK / night</span>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Verified prices in Myanmar Kyat.</p>
-
+          <p className="text-xs text-gray-400 mb-4">Verified prices in Myanmar Kyat.</p>
           <div className="space-y-3">
             {hotels.map((hotel) => {
               const rooms = hotel.hotel_rooms ?? [];
               const minPrice = rooms.length > 0
                 ? Math.min(...rooms.map((r) => r.price_per_night))
                 : hotel.price_per_night_mmk;
-
               return (
                 <div key={hotel.id} className="border border-gray-100 dark:border-gray-800 rounded-xl p-3">
-                  {/* Hotel header */}
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight">{hotel.name}</h3>
+                    <h3 className="font-semibold text-sm text-gray-900 dark:text-white leading-tight">{hotel.name}</h3>
                     <div className="flex flex-col items-end gap-1 shrink-0">
                       {hotel.price_category && (
-                        <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full capitalize">
+                        <span className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-500 px-2 py-0.5 rounded-full capitalize">
                           {hotel.price_category}
                         </span>
                       )}
                       {minPrice != null && (
                         <p className="text-[11px] text-gray-400 whitespace-nowrap">
-                          From <span className="font-bold text-red-600 dark:text-red-400">{minPrice.toLocaleString()}</span>
+                          From <span className="font-bold text-red-600">{minPrice.toLocaleString()}</span>
                         </p>
                       )}
                     </div>
                   </div>
-                  {/* Room list */}
                   {rooms.length > 0 && (
                     <div className="space-y-1">
                       {rooms.map((room) => (
-                        <div key={room.room_type} className="flex items-center justify-between text-xs py-0.5 border-t border-gray-50 dark:border-gray-800/60">
-                          <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                        <div key={room.room_type} className="flex items-center justify-between text-xs py-0.5 border-t border-gray-50 dark:border-gray-800">
+                          <span className="text-gray-500 flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block shrink-0" />
                             {room.room_type}
                           </span>
@@ -232,12 +217,12 @@ export default async function DestinationPage({ params }: { params: { slug: stri
           </div>
         </div>
 
-        {/* ── CTA ── */}
+        {/* CTAs */}
         <div className="flex flex-col gap-2 pb-2">
           <Link
             href="/planner"
             prefetch
-            className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-sm shadow-sm"
+            className="w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-sm shadow-sm"
           >
             {config.planLabel}
           </Link>
