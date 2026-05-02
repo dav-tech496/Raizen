@@ -30,7 +30,11 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
       await generateItineraryPDF(result, lang)
     } catch (err) {
       console.error('PDF generation failed:', err)
-      alert(isEn ? 'PDF generation failed. Please try again.' : 'PDF ဖန်တီးမရပါ')
+      alert(
+        isEn
+          ? 'Could not open print preview. Please allow pop-ups for this site and try again.'
+          : 'PDF ဖွင့်၍မရပါ။ Pop-up ခွင့်ပြုပါ။'
+      )
     }
   }, [result, lang, isEn])
 
@@ -184,12 +188,13 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
           onClick={handleDownloadPDF}
           className={`${onSave ? '' : 'flex-1'} flex items-center justify-center gap-2 bg-surface text-green text-[13px] font-semibold py-[15px] rounded-md border-2 border-green transition-all active:bg-green-pale`}
         >
+          {/* Printer icon — signals "print preview" rather than direct download */}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
+            <polyline points="6 9 6 2 18 2 18 9" />
+            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
           </svg>
-          {t('saveAsPdf')}
+          {isEn ? 'Print / Save PDF' : 'PDF သိမ်းဆည်းရန်'}
         </button>
       </div>
 
