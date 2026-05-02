@@ -66,7 +66,12 @@ export default function PlannerClient({ destinations, hotels, transports, templa
     await new Promise((res) => setTimeout(res, 2800))
     clearInterval(interval)
 
-    const planResult = buildPlanResult(values, hotels, transports, templates)
+    const destId = values.destinationId
+    const filteredHotels    = hotels.filter((h) => h.destination_id === destId)
+    const filteredTransports = transports.filter((t) => t.destination_id === destId)
+    const filteredTemplates  = templates.filter((t) => t.destination_id === destId)
+
+    const planResult = buildPlanResult(values, filteredHotels, filteredTransports, filteredTemplates)
 
     // Resolve destination display name
     const destName =
