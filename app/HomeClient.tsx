@@ -55,41 +55,55 @@ export default function HomeClient() {
 
         {/* ── TRUST SECTION ── */}
         <section className="px-[18px] pb-7">
-          <div className="bg-surface border border-border rounded-md p-[18px] shadow-sm">
-            <div className="text-[11px] font-medium tracking-[0.09em] uppercase text-green mb-3">
-              {t('whyTrustUs')}
-            </div>
+          <div className="text-[11px] font-medium tracking-[0.09em] uppercase text-green mb-[5px]">
+            {t('ourCredentials')}
+          </div>
+          <div className="text-[21px] font-semibold text-ink tracking-[-0.35px] mb-4">
+            {t('trustedAndVerified')}
+          </div>
 
-            {/* DPTOA badge row */}
-            <div className="flex items-center gap-3 pb-4 mb-4 border-b border-border">
-              {/* DPTOA logo placeholder — replace src with your actual logo */}
-              <div className="w-[44px] h-[44px] rounded-[10px] bg-green-pale border border-border flex items-center justify-center flex-shrink-0">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
+          {/* DPTOA card — primary credential */}
+          <div className="bg-surface border border-border rounded-md p-[18px] shadow-sm mb-3">
+            <div className="flex items-center gap-4">
+              {/* DPTOA logo — replace /dptoa-logo.png with your actual file in /public */}
+              <div className="w-[64px] h-[64px] rounded-full overflow-hidden border-2 border-[#E0F0FB] flex-shrink-0 bg-[#EBF6FD]">
+                <img
+                  src="/dptoa-logo.png"
+                  alt="DPTOA Logo"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <div>
-                <div className="text-[14px] font-semibold text-ink mb-[2px]">
-                  {t('dptoaMember')}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-[4px] flex-wrap">
+                  <span className="text-[15px] font-semibold text-ink leading-tight">
+                    {t('dptoaMember')}
+                  </span>
+                  {/* Verified pill */}
+                  <span className="inline-flex items-center gap-[4px] bg-green-pale text-green text-[10px] font-semibold px-[8px] py-[3px] rounded-full flex-shrink-0">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {t('verified')}
+                  </span>
                 </div>
-                <div className="text-[12px] text-ink3 font-light">
-                  {t('dptoaDesc')}
+                <div className="text-[12px] text-ink3 font-light leading-[1.45]">
+                  {t('dptoaFullName')}
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Built for Myanmar */}
-            <div className="flex items-center gap-3">
-              <div className="w-[44px] h-[44px] rounded-[10px] bg-green-pale border border-border flex items-center justify-center flex-shrink-0">
-                <span className="text-[20px]">🇲🇲</span>
+          {/* Built for Myanmar — secondary, lighter treatment */}
+          <div className="flex items-center gap-3 px-[14px] py-[13px] bg-surface border border-border rounded-md">
+            <span className="text-[24px] flex-shrink-0">🇲🇲</span>
+            <div>
+              <div className="text-[13px] font-semibold text-ink mb-[1px]">
+                {t('builtForMyanmar')}
               </div>
-              <div>
-                <div className="text-[14px] font-semibold text-ink mb-[2px]">
-                  {t('builtForMyanmar')}
-                </div>
-                <div className="text-[12px] text-ink3 font-light">
-                  {t('builtForMyanmarDesc')}
-                </div>
+              <div className="text-[12px] text-ink3 font-light">
+                {t('builtForMyanmarDesc')}
               </div>
             </div>
           </div>
