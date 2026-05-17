@@ -8,13 +8,13 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
+        hostname: 'upload.wikimedia.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
       },
     ],
-  },
-  webpack: (config) => {
-    config.resolve.fallback = { ...config.resolve.fallback, punycode: false }
-    return config
   },
 }
 
