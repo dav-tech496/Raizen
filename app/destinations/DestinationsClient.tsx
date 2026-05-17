@@ -18,16 +18,18 @@ const DESTINATION_META: Record<
   { heroImage: string; nights: string; rating: string; tagline: string; distance: string }
 > = {
   ngwesaung: {
+    // Real-looking beach — white sand, clear water, palm trees
     heroImage:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Ngwe_Saung_beach.jpg/1280px-Ngwe_Saung_beach.jpg',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&auto=format&fit=crop&q=80',
     nights: '2–7 nights',
     rating: '4.8',
     tagline: "Myanmar's most beautiful beach",
     distance: '5 hrs from Yangon',
   },
   'chaung-thar': {
+    // Warm tropical beach town feel
     heroImage:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/20170304_084223-01_Chaungtha_beach.jpg/1280px-20170304_084223-01_Chaungtha_beach.jpg',
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&auto=format&fit=crop&q=80',
     nights: '2–5 nights',
     rating: '4.6',
     tagline: "Myanmar's most loved local beach",
@@ -48,7 +50,7 @@ export default function DestinationsClient({ destinations }: Props) {
 
         {/* ── Hero Banner ──────────────────────────────────────────── */}
         <div className="bg-green px-[22px] py-8 relative overflow-hidden">
-          {/* Decorative circles — identical DNA to home page */}
+          {/* Decorative circles — same DNA as home page */}
           <div className="absolute top-[-60px] right-[-50px] w-[180px] h-[180px] rounded-full bg-white/[0.07]" />
           <div className="absolute top-[20px] right-[30px] w-[80px] h-[80px] rounded-full bg-white/[0.05]" />
           <div className="absolute bottom-[-40px] left-[-30px] w-[130px] h-[130px] rounded-full bg-white/[0.06]" />
