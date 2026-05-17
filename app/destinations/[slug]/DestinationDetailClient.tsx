@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar'
 import Drawer from '@/components/Drawer'
 import BottomNav from '@/components/BottomNav'
 import { useLang } from '@/context/LangContext'
-import type { Hotel, HotelRoom } from './page'
+import type { Hotel, HotelRoom, DestinationConfig } from './config'
 
 /* ─── Types ─────────────────────────────────────────────────────── */
 interface DestinationRow {
@@ -19,23 +19,10 @@ interface DestinationRow {
   highlights: string[] | null
 }
 
-interface Config {
-  heroImage: string
-  galleryImages: { src: string; alt: string }[]
-  tagline: string
-  bodyText: string[]
-  badgeTags: string[]
-  bestTime: string
-  planLabel: string
-  rating: string
-  nights: string
-  distance: string
-}
-
 interface Props {
   destination: DestinationRow
   hotels: Hotel[]
-  config: Config
+  config: DestinationConfig
 }
 
 /* ─── Category badge styling ────────────────────────────────────── */
