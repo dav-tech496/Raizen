@@ -7,149 +7,351 @@ import Navbar from '@/components/Navbar'
 import Drawer from '@/components/Drawer'
 import BottomNav from '@/components/BottomNav'
 import { useLang } from '@/context/LangContext'
-import { formatMMK } from '@/lib/plannerLogic'
-import type { Destination, Hotel } from '@/types'
+import type { Hotel, HotelRoom } from './page'
 
-interface Props { destination: Destination; hotels: Hotel[] }
-
-const GALLERY = [
-  { src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80&auto=format&fit=crop', en: 'White Sand Coastline',   mm: 'သဲဖြူကမ်းနံဘေး' },
-  { src: 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=600&q=80&auto=format&fit=crop', en: 'Crystal Clear Waters',    mm: 'ရှင်းလင်းသောရေများ' },
-  { src: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&q=80&auto=format&fit=crop', en: 'Resort Pool',            mm: 'Resort ရေကူးကန်' },
-  { src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80&auto=format&fit=crop', en: 'Beach Sunset',             mm: 'ကမ်းနံဘေး နေဝင်ချိန်' },
-  { src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80&auto=format&fit=crop', en: 'Water Sports',             mm: 'ရေကစားနည်း' },
-]
-
-const TIER_CSS: Record<string, string> = {
-  'mid-range': 'bg-[#EDE9FE] text-[#5B21B6]',
-  villa:       'bg-green-pale text-green',
-  premium:     'bg-[#FCE7F3] text-[#9D174D]',
-  luxury:      'bg-amber-pale text-[#92400E]',
+/* ─── Types ─────────────────────────────────────────────────────── */
+interface DestinationRow {
+  id: string
+  name: string
+  slug: string
+  region: string
+  description: string | null
+  highlights: string[] | null
 }
 
-export default function DestinationDetailClient({ destination, hotels }: Props) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const { lang, t } = useLang()
+interface Config {
+  heroImage: string
+  galleryImages: { src: string; alt: string }[]
+  tagline: string
+  bodyText: string[]
+  badgeTags: string[]
+  bestTime: string
+  planLabel: string
+  rating: string
+  nights: string
+  distance: string
+}
 
-  const imgSrc = destination.image_url
-    ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=90&auto=format&fit=crop'
+interface Props {
+  destination: DestinationRow
+  hotels: Hotel[]
+  config: Config
+}
+
+/* ─── Category badge styling ────────────────────────────────────── */
+const CATEGORY_STYLE: Record<string, { label: string; bg: string; text: string }> = {
+  luxury:      { label: 'Luxury',    bg: 'bg-green-pale', text: 'text-green'     },
+  premium:     { label: 'Premium',   bg: 'bg-amber-pale', text: 'text-amber'     },
+  'mid-range': { label: 'Mid-Range', bg: 'bg-[#EEF6FF]',  text: 'text-[#1D6FA4]' },
+  budget:      { label: 'Budget',    bg: 'bg-surface2',   text: 'text-ink2'      },
+}
+
+function getCategoryStyle(cat: string | null) {
+  if (!cat) return CATEGORY_STYLE.budget
+  return CATEGORY_STYLE[cat.toLowerCase()] ?? CATEGORY_STYLE.budget
+}
+
+/* ─── HotelCard with accordion ──────────────────────────────────── */
+function HotelCard({ hotel }: { hotel: Hotel }) {
+  const [open, setOpen] = useState(false)
+  const rooms: HotelRoom[] = hotel.hotel_rooms ?? []
+
+  const minPrice =
+    rooms.length > 0
+      ? Math.min(...rooms.map((r) => r.price_per_night))
+      : hotel.price_per_night_mmk
+
+  const cat = getCategoryStyle(hotel.price_category)
+
+  return (
+    <div className="bg-surface border border-border rounded-lg overflow-hidden shadow-sm">
+      {/* Always-visible header */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-[14px] text-left active:bg-surface2 transition-colors"
+        aria-expanded={open}
+      >
+        <div className="flex flex-col gap-[5px] flex-1 min-w-0 pr-3">
+          <span className="text-[14px] font-semibold text-ink leading-tight">
+            {hotel.name}
+          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            {hotel.price_category && (
+              <span className={`text-[10px] font-semibold px-[8px] py-[3px] rounded-full ${cat.bg} ${cat.text}`}>
+                {cat.label}
+              </span>
+            )}
+            {minPrice != null && (
+              <span className="text-[12px] text-ink2">
+                From{' '}
+                <span className="font-bold text-green text-[13px]">
+                  {minPrice.toLocaleString()}
+                </span>{' '}
+                <span className="text-ink3">MMK/night</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Chevron toggle */}
+        <div
+          className={`flex-shrink-0 w-7 h-7 rounded-full bg-surface2 border border-border flex items-center justify-center transition-transform duration-200 ${
+            open ? 'rotate-180' : ''
+          }`}
+        >
+          <svg
+            width="12" height="12" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="2.5"
+            strokeLinecap="round" strokeLinejoin="round"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </div>
+      </button>
+
+      {/* Accordion body */}
+      {open && rooms.length > 0 && (
+        <div className="border-t border-border bg-surface2/60 px-4 py-3 flex flex-col gap-[10px]">
+          {rooms.map((room) => (
+            <div key={room.room_type} className="flex items-center justify-between">
+              <div className="flex items-center gap-[8px]">
+                <span className="w-[6px] h-[6px] rounded-full bg-green flex-shrink-0" />
+                <span className="text-[12px] text-ink2">{room.room_type}</span>
+                {room.capacity != null && (
+                  <span className="text-[11px] text-ink3">· {room.capacity} pax</span>
+                )}
+              </div>
+              <span className="text-[13px] font-semibold text-ink">
+                {room.price_per_night.toLocaleString()}{' '}
+                <span className="text-[11px] font-normal text-ink3">MMK</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ─── Main client component ─────────────────────────────────────── */
+export default function DestinationDetailClient({
+  destination,
+  hotels,
+  config,
+}: Props) {
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const { lang } = useLang()
 
   return (
     <>
       <Navbar onMenuOpen={() => setDrawerOpen(true)} />
       <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} user={null} />
 
-      <main className="max-w-[480px] mx-auto pb-[160px]">
-        {/* Hero image */}
-        <div className="relative h-[270px]">
-          <Image src={imgSrc} alt={destination.name} fill className="object-cover" sizes="480px" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-[18px]">
-            <div className="text-[11px] font-medium tracking-[0.08em] uppercase text-white/60 mb-[5px]">{t('region')}</div>
-            <h1 className="font-serif text-[28px] font-medium text-white tracking-[-0.3px] mb-2">{destination.name}</h1>
-            <div className="flex gap-2 flex-wrap">
-              {['20km Beach', 'Year-Round Sun', '★ 4.8'].map((p) => (
-                <span key={p} className="text-xs bg-white/15 backdrop-blur-[8px] border border-white/20 text-white rounded-full px-3 py-1">{p}</span>
+      {/* pb-[152px] = BottomNav 64px + sticky CTA ~72px + gap */}
+      <main className="max-w-[480px] mx-auto pb-[152px] bg-bg">
+
+        {/* ── 1. Hero ───────────────────────────────────────────── */}
+        <div className="relative h-[280px] w-full overflow-hidden">
+          <Image
+            src={config.heroImage}
+            alt={destination.name}
+            fill
+            priority
+            className="object-cover"
+            sizes="(max-width: 480px) 100vw, 480px"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/85" />
+
+          {/* Back button */}
+          <Link
+            href="/destinations"
+            aria-label="Back to destinations"
+            className="absolute top-4 left-4 w-9 h-9 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors hover:bg-black/60 active:bg-black/70"
+          >
+            <svg
+              width="16" height="16" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" strokeWidth="2.5"
+              strokeLinecap="round" strokeLinejoin="round"
+            >
+              <path d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </Link>
+
+          {/* Name + badge tags */}
+          <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
+            <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-white/60 mb-[4px]">
+              {destination.region}
+            </p>
+            <h1 className="font-serif text-[26px] font-bold text-white tracking-[-0.4px] leading-tight mb-3">
+              {destination.name}
+            </h1>
+            <div className="flex flex-wrap gap-[6px]">
+              {config.badgeTags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] bg-white/20 backdrop-blur-sm text-white px-[10px] py-[4px] rounded-full font-medium"
+                >
+                  {tag}
+                </span>
               ))}
             </div>
           </div>
         </div>
 
-        {/* About */}
-        <div className="px-[18px] py-[22px]">
-          <h2 className="text-[17px] font-semibold text-ink tracking-[-0.25px] mb-[10px]">{t('whereTheBay')}</h2>
-          <p className="text-sm text-ink2 leading-[1.72] font-light">
-            {lang === 'mm'
-              ? 'ငွေဆောင် (ငွေ့ကမ်း) သည် မြန်မာနိုင်ငံ၏ အလှဆုံးနှင့် ဖွံ့ဖြိုးမှု အနည်းဆုံး ကမ်းနံဘေးများထဲမှ တစ်ခုဖြစ်သည်။ ရန်ကုန်မှ ၆ နာရီခန့် ကွာဝေးပြီး ကမ်းနံဘေး ၂၀ ကီလိုမီတာ ဆက်တိုက်တည်ရှိသည်'
-              : "Ngwe Saung (Silver Beach) is one of Myanmar's most beautiful and least-developed beaches. Located about 6 hours from Yangon, the beach stretches for 20 uninterrupted kilometers — just sand, sea, and sky."}
-          </p>
-          <p className="text-sm text-ink2 leading-[1.72] font-light mt-[10px]">
-            {lang === 'mm'
-              ? 'ပိုမိုဆူညံသော ငပလီကမ်းနံဘေးနှင့် မတူဘဲ ငွေဆောင်သည် ငြိမ်းချမ်းသောဝိသေသလက္ခဏာကို ထိန်းသိမ်းထားသည်'
-              : "Unlike the busier Ngapali Beach, Ngwe Saung retains a quiet, authentic character. Local fishing villages, fresh seafood restaurants, and resorts from budget villas to luxury bungalows."}
-          </p>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 px-[18px] mb-1">
-          {(lang === 'mm'
-            ? ['သဲဖြူ ၂၀ ကီလိုမီတာ','အချစ်သူများကျွန်း','ဆည်းဆာ Resort','ပင်လယ်စာ','ရေကစားနည်း','ငြိမ်းချမ်းသော']
-            : ['20km White Sand',"Lover's Island",'Luxury Resorts','Fresh Seafood','Water Sports','Peaceful']
-          ).map((tag) => (
-            <span key={tag} className="text-[11px] px-[10px] py-1 rounded-full bg-surface2 text-ink2 border border-border">{tag}</span>
-          ))}
-        </div>
-
-        {/* Best time */}
-        <div className="mx-[18px] my-4 bg-surface border border-border rounded-md px-[18px] py-4 flex items-center gap-[14px] shadow-sm">
-          <div className="w-[42px] h-[42px] rounded-[12px] bg-amber-pale flex-shrink-0 flex items-center justify-center text-xl">☀️</div>
-          <div>
-            <div className="text-xs font-medium tracking-[0.05em] uppercase text-ink3 mb-[3px]">{t('bestTimeToVisit')}</div>
-            <div className="text-[15px] font-semibold text-ink">{t('bestTimePeriod')}</div>
-          </div>
-        </div>
-
-        {/* Gallery */}
-        <div className="px-[18px] pt-[22px] pb-3">
-          <h2 className="text-[17px] font-semibold text-ink mb-3">{t('seeBeauty')}</h2>
-        </div>
-        <div className="flex gap-[10px] overflow-x-auto px-[18px] pb-1 scrollbar-hide">
-          {GALLERY.map((img) => (
-            <div key={img.src} className="relative w-[175px] h-[128px] rounded-md overflow-hidden flex-shrink-0">
-              <Image src={img.src} alt={lang === 'mm' ? img.mm : img.en} fill className="object-cover" sizes="175px" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/65 to-transparent px-[10px] pb-2 pt-3">
-                <span className="text-[11px] text-white">{lang === 'mm' ? img.mm : img.en}</span>
-              </div>
+        {/* ── 2. Quick Stats Bar ───────────────────────────────── */}
+        <div className="bg-surface border-b border-border px-4 py-[14px] grid grid-cols-4 divide-x divide-border">
+          {[
+            { icon: '⭐', value: config.rating,   label: lang === 'mm' ? 'အဆင့်' : 'Rating'      },
+            { icon: '🌙', value: config.nights,   label: lang === 'mm' ? 'နေမည်'  : 'Stay'         },
+            { icon: '🚌', value: config.distance, label: lang === 'mm' ? 'ရောက်ရန်' : 'From Yangon' },
+            { icon: '☀️', value: 'Nov–Apr',       label: lang === 'mm' ? 'အချိန်'  : 'Best Time'   },
+          ].map(({ icon, value, label }) => (
+            <div key={label} className="flex flex-col items-center gap-[2px] px-1">
+              <span className="text-[17px] leading-none">{icon}</span>
+              <span className="text-[11px] font-semibold text-ink text-center leading-tight mt-[2px]">
+                {value}
+              </span>
+              <span className="text-[9px] text-ink3 text-center leading-tight">{label}</span>
             </div>
           ))}
         </div>
 
-        {/* Hotels */}
-        <div className="px-[18px] pt-[22px] pb-3">
-          <h2 className="text-[17px] font-semibold text-ink mb-[10px]">{t('verifiedHotels')}</h2>
-          <p className="text-[13px] text-ink3 font-light mb-4">{t('allPricesNote')}</p>
-        </div>
-        <div className="flex flex-col gap-[11px] px-[18px]">
-          {hotels.map((hotel) => (
-            <div key={hotel.id} className="bg-surface border border-border rounded-md overflow-hidden shadow-sm">
-              <div className="flex items-start justify-between px-4 py-[14px] border-b border-border">
-                <div>
-                  <div className="text-[15px] font-semibold text-ink mb-1">{hotel.name}</div>
-                  <span className={`text-[10px] font-medium px-[9px] py-[3px] rounded-full ${TIER_CSS[hotel.price_category] ?? 'bg-surface2 text-ink2'}`}>
-                    {hotel.price_category}
-                  </span>
-                </div>
-                <div className="text-right text-xs text-ink3">
-                  {t('from')}
-                  <strong className="block text-[15px] font-semibold text-green">
-                    {formatMMK(Math.min(...hotel.rooms.map((r) => r.price_per_night)))} MMK
-                  </strong>
-                </div>
+        <div className="px-[18px] pt-5 flex flex-col gap-5">
+
+          {/* ── 3. Hotels & Pricing ──────────────────────────── */}
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h2 className="text-[16px] font-semibold text-ink tracking-[-0.2px]">
+                  {lang === 'mm' ? 'ဟိုတယ်များနှင့် ဈေးနှုန်း' : 'Hotels & Pricing'}
+                </h2>
+                <p className="text-[11px] text-ink3 font-light mt-[2px]">
+                  {lang === 'mm'
+                    ? 'စစ်ဆေးပြီး MMK ဈေးနှုန်းများ'
+                    : 'Verified prices in Myanmar Kyat · tap to expand'}
+                </p>
               </div>
-              <div className="px-4 pb-[14px] pt-2">
-                {hotel.rooms.map((room) => (
-                  <div key={room.id} className="flex justify-between items-center py-2 border-b border-border last:border-0">
-                    <span className="text-[13px] text-ink2 font-light">{room.room_type}</span>
-                    <span className="text-[13px] font-semibold text-ink">{formatMMK(room.price_per_night)}</span>
+              <span className="text-[10px] font-semibold bg-green-pale text-green px-[10px] py-[4px] rounded-full flex-shrink-0">
+                MMK / night
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-[10px]">
+              {hotels.length === 0 ? (
+                <p className="text-[13px] text-ink3 text-center py-8">
+                  {lang === 'mm' ? 'ဟိုတယ်မရှိသေးပါ' : 'No hotels listed yet.'}
+                </p>
+              ) : (
+                hotels.map((hotel) => <HotelCard key={hotel.id} hotel={hotel} />)
+              )}
+            </div>
+          </section>
+
+          {/* ── 4. About ─────────────────────────────────────── */}
+          <section className="bg-surface border border-border rounded-lg p-4 shadow-sm">
+            <h2 className="text-[16px] font-semibold text-ink tracking-[-0.2px] mb-[4px]">
+              {config.tagline}
+            </h2>
+            <div className="w-8 h-[2.5px] bg-green rounded-full mb-3" />
+
+            {config.bodyText.map((para, i) => (
+              <p
+                key={i}
+                className="text-[13px] text-ink2 font-light leading-[1.65] mb-2 last:mb-0"
+              >
+                {para}
+              </p>
+            ))}
+
+            {/* Full badge tags */}
+            <div className="flex flex-wrap gap-[6px] mt-4">
+              {config.badgeTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[11px] bg-green-pale text-green px-[10px] py-[4px] rounded-full font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {/* Best time chip */}
+            <div className="mt-4 bg-amber-pale rounded-md px-3 py-[10px] flex items-center gap-3">
+              <span className="text-[20px] leading-none">☀️</span>
+              <div>
+                <p className="text-[11px] font-semibold text-amber">
+                  {lang === 'mm' ? 'သွားရန် အကောင်းဆုံးအချိန်' : 'Best time to visit'}
+                </p>
+                <p className="text-[12px] text-ink2 font-light">{config.bestTime}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* ── 5. Gallery — horizontal scroll ───────────────── */}
+          <section>
+            <h2 className="text-[16px] font-semibold text-ink tracking-[-0.2px] mb-3">
+              {lang === 'mm' ? 'ဓာတ်ပုံများ' : 'Gallery'}
+            </h2>
+            {/* Negative margin trick so photos bleed to screen edge */}
+            <div className="-mx-[18px] px-[18px] flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+              {config.galleryImages.map((img) => (
+                <div
+                  key={img.src}
+                  className="relative flex-shrink-0 w-[155px] h-[205px] rounded-lg overflow-hidden border border-border shadow-sm"
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    className="object-cover"
+                    sizes="155px"
+                  />
+                </div>
+              ))}
+              {/* Right-side breathing room */}
+              <div className="flex-shrink-0 w-[2px]" />
+            </div>
+          </section>
+
+          {/* ── 6. DB Highlights grid ────────────────────────── */}
+          {destination.highlights && destination.highlights.length > 0 && (
+            <section className="bg-surface border border-border rounded-lg p-4 shadow-sm">
+              <h2 className="text-[15px] font-semibold text-ink mb-3">
+                {lang === 'mm' ? 'အထူးအချက်များ' : 'Highlights'}
+              </h2>
+              <div className="grid grid-cols-2 gap-[8px]">
+                {destination.highlights.map((h: string) => (
+                  <div
+                    key={h}
+                    className="flex items-center gap-[8px] bg-surface2 rounded-md px-3 py-[10px]"
+                  >
+                    <span className="w-[6px] h-[6px] rounded-full bg-green flex-shrink-0" />
+                    <span className="text-[12px] text-ink2 font-light leading-tight">{h}</span>
                   </div>
                 ))}
               </div>
-            </div>
-          ))}
+            </section>
+          )}
+
         </div>
-        <div className="h-5" />
       </main>
 
-      {/* Sticky CTA */}
-      <div className="fixed bottom-[72px] left-0 right-0 z-50 bg-bg/95 backdrop-blur-[12px] border-t border-border px-[18px] py-3 no-print">
-        <div className="flex gap-[10px] max-w-[480px] mx-auto">
-          <Link href="/planner" className="flex-1 bg-green text-white text-sm font-semibold py-[14px] rounded-[14px] text-center">
-            {t('planNgweSaung')}
-          </Link>
-          <Link href="/destinations" className="px-4 py-[14px] rounded-[14px] text-sm font-medium text-ink2 border border-border2">
-            {t('backBtn')}
-          </Link>
-        </div>
+      {/* ── Sticky CTA bar — floats above BottomNav ─────────────── */}
+      <div className="fixed bottom-[64px] left-0 right-0 z-40 max-w-[480px] mx-auto px-[18px] pt-[10px] pb-[10px] bg-bg/95 backdrop-blur-[10px] border-t border-border no-print">
+        <Link
+          href="/planner"
+          prefetch
+          className="flex items-center justify-center gap-[8px] w-full bg-green text-white text-[14px] font-semibold py-[15px] rounded-md shadow-md active:opacity-80 transition-opacity"
+        >
+          {lang === 'mm' ? 'ခရီးစဉ်စီစဉ်မည်' : config.planLabel}
+          <svg
+            width="15" height="15" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="2.5"
+            strokeLinecap="round" strokeLinejoin="round"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </Link>
       </div>
 
       <BottomNav />
