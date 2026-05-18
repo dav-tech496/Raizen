@@ -29,25 +29,24 @@ export interface DestinationConfig {
 /* ─── Static config per destination ────────────────────────────── */
 export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
   ngwesaung: {
-    // Hero — tropical white sand beach, wide angle
     heroImage:
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=85&auto=format&fit=crop',
     galleryImages: [
       {
         src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80&auto=format&fit=crop',
-        alt: 'Ngwe Saung white sand beach',
+        alt: 'White sand beach',
       },
       {
         src: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600&q=80&auto=format&fit=crop',
-        alt: 'Crystal clear waters',
+        alt: 'Clear ocean waters',
       },
       {
         src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80&auto=format&fit=crop',
-        alt: 'Beach sunset',
+        alt: 'Beach at sunset',
       },
       {
         src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80&auto=format&fit=crop',
-        alt: 'Water sports',
+        alt: 'Beachside activities',
       },
       {
         src: 'https://images.unsplash.com/photo-1439130490301-25e322d88054?w=600&q=80&auto=format&fit=crop',
@@ -67,7 +66,6 @@ export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
     distance: '5 hrs from Yangon',
   },
   'chaung-thar': {
-    // Hero — lively local beach with warm golden tones
     heroImage:
       'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=85&auto=format&fit=crop',
     galleryImages: [
@@ -77,19 +75,19 @@ export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
       },
       {
         src: 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=600&q=80&auto=format&fit=crop',
-        alt: 'Sunset over the bay',
+        alt: 'Golden sunset over the bay',
       },
       {
         src: 'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=600&q=80&auto=format&fit=crop',
-        alt: 'Sandy shore',
+        alt: 'Sandy shoreline',
       },
       {
-        src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80&auto=format&fit=crop',
-        alt: 'Beachside seafood',
+        src: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80&auto=format&fit=crop',
+        alt: 'Tropical beach scenery',
       },
       {
-        src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80&auto=format&fit=crop',
-        alt: 'Local beach life',
+        src: 'https://images.unsplash.com/photo-1484821582734-6692f86aee4c?w=600&q=80&auto=format&fit=crop',
+        alt: 'Beach at dusk',
       },
     ],
     tagline: "Myanmar's Most Loved Local Beach",
