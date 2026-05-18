@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Explore top beach destinations in Myanmar with verified MMK hotel prices.',
 }
 
-export const revalidate = 3600
+export const revalidate = 0
 
 const AVAILABLE_SLUGS = ['ngwesaung', 'chaung-thar']
 
