@@ -18,18 +18,16 @@ const DESTINATION_META: Record<
   { heroImage: string; nights: string; rating: string; tagline: string; distance: string }
 > = {
   ngwesaung: {
-    // Real-looking beach — white sand, clear water, palm trees
     heroImage:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&auto=format&fit=crop',
     nights: '2–7 nights',
     rating: '4.8',
     tagline: "Myanmar's most beautiful beach",
     distance: '5 hrs from Yangon',
   },
   'chaung-thar': {
-    // Warm tropical beach town feel
     heroImage:
-      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&auto=format&fit=crop',
     nights: '2–5 nights',
     rating: '4.6',
     tagline: "Myanmar's most loved local beach",
@@ -50,13 +48,11 @@ export default function DestinationsClient({ destinations }: Props) {
 
         {/* ── Hero Banner ──────────────────────────────────────────── */}
         <div className="bg-green px-[22px] py-8 relative overflow-hidden">
-          {/* Decorative circles — same DNA as home page */}
           <div className="absolute top-[-60px] right-[-50px] w-[180px] h-[180px] rounded-full bg-white/[0.07]" />
           <div className="absolute top-[20px] right-[30px] w-[80px] h-[80px] rounded-full bg-white/[0.05]" />
           <div className="absolute bottom-[-40px] left-[-30px] w-[130px] h-[130px] rounded-full bg-white/[0.06]" />
 
           <div className="relative">
-            {/* Eyebrow pill */}
             <div className="inline-flex items-center gap-[6px] bg-white/[0.13] border border-white/[0.18] rounded-full px-3 py-[5px] mb-4">
               <span className="w-[6px] h-[6px] rounded-full bg-white/80 animate-pulse-slow" />
               <span className="text-[11px] font-medium tracking-[0.09em] uppercase text-white/80">
@@ -65,14 +61,10 @@ export default function DestinationsClient({ destinations }: Props) {
             </div>
 
             <h1 className="font-serif text-[28px] font-bold text-white leading-[1.2] tracking-[-0.5px] mb-3">
-              {lang === 'mm'
-                ? 'ဘယ်နေရာသွားချင်သလဲ?'
-                : 'Where do you want to go?'}
+              {lang === 'mm' ? 'ဘယ်နေရာသွားချင်သလဲ?' : 'Where do you want to go?'}
             </h1>
             <p className="text-[13px] text-white/65 font-light leading-[1.5]">
-              {lang === 'mm'
-                ? 'ဦးတည်ရာနေရာတစ်ခုကို ရွေးချယ်ပါ'
-                : 'Choose your destination'}
+              {lang === 'mm' ? 'ဦးတည်ရာနေရာတစ်ခုကို ရွေးချယ်ပါ' : 'Choose your destination'}
             </p>
           </div>
         </div>
@@ -84,19 +76,21 @@ export default function DestinationsClient({ destinations }: Props) {
             if (!meta) return null
 
             return (
-              <Link
+              <div
                 key={dest.id}
-                href={`/destinations/${dest.slug}`}
-                className="group block bg-surface rounded-lg border border-border shadow-sm overflow-hidden active:scale-[0.985] transition-transform duration-150"
+                className="bg-surface rounded-lg border border-border shadow-sm overflow-hidden"
               >
-                {/* ── Photo ── */}
-                <div className="relative h-[230px] w-full overflow-hidden">
+                {/* ── Photo — entire top half is a link ── */}
+                <Link
+                  href={`/destinations/${dest.slug}`}
+                  className="block relative h-[230px] w-full overflow-hidden group"
+                >
                   <Image
                     src={meta.heroImage}
                     alt={dest.name}
                     fill
                     priority={i === 0}
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    className="object-cover transition-transform duration-500 group-active:scale-[1.03]"
                     sizes="(max-width: 480px) 100vw, 480px"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -124,7 +118,7 @@ export default function DestinationsClient({ destinations }: Props) {
                       {meta.tagline}
                     </p>
                   </div>
-                </div>
+                </Link>
 
                 {/* ── Card Body ── */}
                 <div className="px-4 pt-[14px] pb-4">
@@ -164,24 +158,23 @@ export default function DestinationsClient({ destinations }: Props) {
                     </div>
                   )}
 
-                  {/* CTA row */}
-                  <div className="flex items-center justify-between border-t border-border pt-3">
-                    <span className="text-[13px] font-semibold text-green flex items-center gap-[6px]">
-                      {lang === 'mm' ? 'ကြည့်ရှုရန်' : 'Explore destination'}
-                      <svg
-                        width="14" height="14" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" strokeWidth="2.5"
-                        strokeLinecap="round" strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                    <span className="text-[11px] text-ink3 font-light">
-                      {lang === 'mm' ? 'ဟိုတယ်ကြည့်ရန်' : 'View hotels & prices'}
-                    </span>
+                  {/* ── CTA buttons — full width, easy to tap ── */}
+                  <div className="flex gap-[10px] pt-1">
+                    <Link
+                      href={`/destinations/${dest.slug}`}
+                      className="flex-1 bg-green text-white text-center text-[13px] font-semibold py-[13px] rounded-md active:opacity-80 transition-opacity"
+                    >
+                      {lang === 'mm' ? 'ကြည့်ရှုရန်' : 'Explore'}
+                    </Link>
+                    <Link
+                      href="/planner"
+                      className="flex-1 border-2 border-green text-green text-center text-[13px] font-semibold py-[13px] rounded-md hover:bg-green-pale active:opacity-80 transition-colors"
+                    >
+                      {lang === 'mm' ? 'ခရီးစဉ်စီစဉ်' : 'Plan Trip'}
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </div>
             )
           })}
         </div>
