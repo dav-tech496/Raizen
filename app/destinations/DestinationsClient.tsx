@@ -19,7 +19,7 @@ const DESTINATION_META: Record<
 > = {
   ngwesaung: {
     heroImage:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&auto=format&fit=crop',
+      'https://upload.wikimedia.org/wikipedia/commons/2/29/Ngwe_Saung_beach_05.jpg',
     nights: '2–7 nights',
     rating: '4.8',
     tagline: "Myanmar's most beautiful beach",
@@ -27,7 +27,7 @@ const DESTINATION_META: Record<
   },
   'chaung-thar': {
     heroImage:
-      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&auto=format&fit=crop',
+      'https://upload.wikimedia.org/wikipedia/commons/e/eb/20170304_084223-01_Chaungtha_beach.jpg',
     nights: '2–5 nights',
     rating: '4.6',
     tagline: "Myanmar's most loved local beach",
