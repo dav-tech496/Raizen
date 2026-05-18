@@ -23,7 +23,8 @@ export async function generateMetadata({
   return { title: titles[params.slug] ?? 'Destination — Raizen Myanmar' }
 }
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 /* ─── Page ───────────────────────────────────────────────────────── */
 export default async function DestinationPage({
