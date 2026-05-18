@@ -29,14 +29,30 @@ export interface DestinationConfig {
 /* ─── Static config per destination ────────────────────────────── */
 export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
   ngwesaung: {
+    // Hero — tropical white sand beach, wide angle
     heroImage:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Ngwe_Saung_beach.jpg/1280px-Ngwe_Saung_beach.jpg',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=85&auto=format&fit=crop',
     galleryImages: [
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Ngwe_Saung_beach.jpg/800px-Ngwe_Saung_beach.jpg', alt: 'Ngwe Saung white sand beach' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Ngwe_Saung_Beach_Myanmar.jpg/800px-Ngwe_Saung_Beach_Myanmar.jpg', alt: 'Ngwe Saung coastline' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Ngwesaung_beach_myanmar.jpg/800px-Ngwesaung_beach_myanmar.jpg', alt: 'Ngwe Saung palm trees' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Ngwe_Saung_Beach_2.jpg/800px-Ngwe_Saung_Beach_2.jpg', alt: 'Ngwe Saung waves' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ngwe_Saung_Twin_Pagoda.jpg/800px-Ngwe_Saung_Twin_Pagoda.jpg', alt: 'Ngwe Saung twin pagoda' },
+      {
+        src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80&auto=format&fit=crop',
+        alt: 'Ngwe Saung white sand beach',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600&q=80&auto=format&fit=crop',
+        alt: 'Crystal clear waters',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80&auto=format&fit=crop',
+        alt: 'Beach sunset',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80&auto=format&fit=crop',
+        alt: 'Water sports',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1439130490301-25e322d88054?w=600&q=80&auto=format&fit=crop',
+        alt: 'Fishing village',
+      },
     ],
     tagline: "Myanmar's Most Beautiful Beach",
     bodyText: [
@@ -51,14 +67,30 @@ export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
     distance: '5 hrs from Yangon',
   },
   'chaung-thar': {
+    // Hero — lively local beach with warm golden tones
     heroImage:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/20170304_084223-01_Chaungtha_beach.jpg/1280px-20170304_084223-01_Chaungtha_beach.jpg',
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=85&auto=format&fit=crop',
     galleryImages: [
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/20170304_084223-01_Chaungtha_beach.jpg/800px-20170304_084223-01_Chaungtha_beach.jpg', alt: 'Chaung Thar beach' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Chaungtha_beach_2017.jpg/800px-Chaungtha_beach_2017.jpg', alt: 'Chaung Thar shoreline' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Chaungtha_Beach_Myanmar.jpg/800px-Chaungtha_Beach_Myanmar.jpg', alt: 'Chaung Thar sunset' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Chaungtha_beach_boats.jpg/800px-Chaungtha_beach_boats.jpg', alt: 'Chaung Thar fishing boats' },
-      { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Chaungtha_local_beach.jpg/800px-Chaungtha_local_beach.jpg', alt: 'Chaung Thar local life' },
+      {
+        src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80&auto=format&fit=crop',
+        alt: 'Chaung Thar beach',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=600&q=80&auto=format&fit=crop',
+        alt: 'Sunset over the bay',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=600&q=80&auto=format&fit=crop',
+        alt: 'Sandy shore',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80&auto=format&fit=crop',
+        alt: 'Beachside seafood',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80&auto=format&fit=crop',
+        alt: 'Local beach life',
+      },
     ],
     tagline: "Myanmar's Most Loved Local Beach",
     bodyText: [
