@@ -27,10 +27,10 @@ interface Props {
 
 /* ─── Category badge styling ────────────────────────────────────── */
 const CATEGORY_STYLE: Record<string, { label: string; bg: string; text: string }> = {
-  luxury:      { label: 'Luxury',    bg: 'bg-green-pale', text: 'text-green'     },
-  premium:     { label: 'Premium',   bg: 'bg-amber-pale', text: 'text-amber'     },
-  'mid-range': { label: 'Mid-Range', bg: 'bg-[#EEF6FF]',  text: 'text-[#1D6FA4]' },
-  budget:      { label: 'Budget',    bg: 'bg-surface2',   text: 'text-ink2'      },
+  luxury:        { label: 'Luxury',    bg: 'bg-green-pale', text: 'text-green'      },
+  premium:       { label: 'Premium',   bg: 'bg-amber-pale', text: 'text-amber'      },
+  'mid-range':   { label: 'Mid-Range', bg: 'bg-[#EEF6FF]',  text: 'text-[#1D6FA4]' },
+  budget:        { label: 'Budget',    bg: 'bg-surface2',   text: 'text-ink2'       },
 }
 
 function getCategoryStyle(cat: string | null) {
@@ -52,7 +52,7 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
 
   return (
     <div className="bg-surface border border-border rounded-lg overflow-hidden shadow-sm">
-      {/* Always-visible header */}
+      {/* Always-visible header row */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-[14px] text-left active:bg-surface2 transition-colors"
@@ -80,7 +80,7 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
           </div>
         </div>
 
-        {/* Chevron toggle */}
+        {/* Chevron */}
         <div
           className={`flex-shrink-0 w-7 h-7 rounded-full bg-surface2 border border-border flex items-center justify-center transition-transform duration-200 ${
             open ? 'rotate-180' : ''
@@ -134,8 +134,14 @@ export default function DestinationDetailClient({
       <Navbar onMenuOpen={() => setDrawerOpen(true)} />
       <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} user={null} />
 
-      {/* pb-[152px] = BottomNav 64px + sticky CTA ~72px + gap */}
-      <main className="max-w-[480px] mx-auto pb-[152px] bg-bg">
+      {/*
+        Bottom padding breakdown:
+        - BottomNav:   ~64px
+        - Sticky CTA:  ~72px (button 52px + padding 20px)
+        - Safe area:   env(safe-area-inset-bottom) — up to 34px on iPhone
+        Total: 160px is safe for all devices
+      */}
+      <main className="max-w-[480px] mx-auto pb-[160px] bg-bg">
 
         {/* ── 1. Hero ───────────────────────────────────────────── */}
         <div className="relative h-[280px] w-full overflow-hidden">
@@ -188,10 +194,10 @@ export default function DestinationDetailClient({
         {/* ── 2. Quick Stats Bar ───────────────────────────────── */}
         <div className="bg-surface border-b border-border px-4 py-[14px] grid grid-cols-4 divide-x divide-border">
           {[
-            { icon: '⭐', value: config.rating,   label: lang === 'mm' ? 'အဆင့်' : 'Rating'      },
-            { icon: '🌙', value: config.nights,   label: lang === 'mm' ? 'နေမည်'  : 'Stay'         },
+            { icon: '⭐', value: config.rating,   label: lang === 'mm' ? 'အဆင့်'   : 'Rating'      },
+            { icon: '🌙', value: config.nights,   label: lang === 'mm' ? 'နေမည်'   : 'Stay'        },
             { icon: '🚌', value: config.distance, label: lang === 'mm' ? 'ရောက်ရန်' : 'From Yangon' },
-            { icon: '☀️', value: 'Nov–Apr',       label: lang === 'mm' ? 'အချိန်'  : 'Best Time'   },
+            { icon: '☀️', value: 'Nov–Apr',       label: lang === 'mm' ? 'အချိန်'   : 'Best Time'  },
           ].map(({ icon, value, label }) => (
             <div key={label} className="flex flex-col items-center gap-[2px] px-1">
               <span className="text-[17px] leading-none">{icon}</span>
@@ -250,7 +256,6 @@ export default function DestinationDetailClient({
               </p>
             ))}
 
-            {/* Full badge tags */}
             <div className="flex flex-wrap gap-[6px] mt-4">
               {config.badgeTags.map((tag) => (
                 <span
@@ -279,7 +284,6 @@ export default function DestinationDetailClient({
             <h2 className="text-[16px] font-semibold text-ink tracking-[-0.2px] mb-3">
               {lang === 'mm' ? 'ဓာတ်ပုံများ' : 'Gallery'}
             </h2>
-            {/* Negative margin trick so photos bleed to screen edge */}
             <div className="-mx-[18px] px-[18px] flex gap-3 overflow-x-auto scrollbar-hide pb-2">
               {config.galleryImages.map((img) => (
                 <div
@@ -295,7 +299,6 @@ export default function DestinationDetailClient({
                   />
                 </div>
               ))}
-              {/* Right-side breathing room */}
               <div className="flex-shrink-0 w-[2px]" />
             </div>
           </section>
@@ -323,8 +326,16 @@ export default function DestinationDetailClient({
         </div>
       </main>
 
-      {/* ── Sticky CTA bar — floats above BottomNav ─────────────── */}
-      <div className="fixed bottom-[64px] left-0 right-0 z-40 max-w-[480px] mx-auto px-[18px] pt-[10px] pb-[10px] bg-bg/95 backdrop-blur-[10px] border-t border-border no-print">
+      {/* ── Sticky CTA bar ───────────────────────────────────────────
+          Sits directly on top of BottomNav.
+          BottomNav is fixed at bottom-0 with height ~64px.
+          We position this at bottom-[64px] and add safe-area padding
+          so it never overlaps on iPhone notch devices.
+      ──────────────────────────────────────────────────────────────── */}
+      <div
+        className="fixed left-0 right-0 z-40 max-w-[480px] mx-auto px-[18px] pt-[10px] pb-[10px] bg-bg/95 backdrop-blur-[10px] border-t border-border no-print"
+        style={{ bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
+      >
         <Link
           href="/planner"
           prefetch
