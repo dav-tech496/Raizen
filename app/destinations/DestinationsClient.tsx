@@ -80,7 +80,7 @@ export default function DestinationsClient({ destinations }: Props) {
                 key={dest.id}
                 className="bg-surface rounded-lg border border-border shadow-sm overflow-hidden"
               >
-                {/* ── Photo — entire top half is a link ── */}
+                {/* ── Photo — entire image area is tappable ── */}
                 <Link
                   href={`/destinations/${dest.slug}`}
                   className="block relative h-[230px] w-full overflow-hidden group"
@@ -122,6 +122,7 @@ export default function DestinationsClient({ destinations }: Props) {
 
                 {/* ── Card Body ── */}
                 <div className="px-4 pt-[14px] pb-4">
+
                   {/* Quick stats */}
                   <div className="flex items-center gap-3 mb-3">
                     <span className="text-[12px] text-ink2">
@@ -158,21 +159,13 @@ export default function DestinationsClient({ destinations }: Props) {
                     </div>
                   )}
 
-                  {/* ── CTA buttons — full width, easy to tap ── */}
-                  <div className="flex gap-[10px] pt-1">
-                    <Link
-                      href={`/destinations/${dest.slug}`}
-                      className="flex-1 bg-green text-white text-center text-[13px] font-semibold py-[13px] rounded-md active:opacity-80 transition-opacity"
-                    >
-                      {lang === 'mm' ? 'ကြည့်ရှုရန်' : 'Explore'}
-                    </Link>
-                    <Link
-                      href="/planner"
-                      className="flex-1 border-2 border-green text-green text-center text-[13px] font-semibold py-[13px] rounded-md hover:bg-green-pale active:opacity-80 transition-colors"
-                    >
-                      {lang === 'mm' ? 'ခရီးစဉ်စီစဉ်' : 'Plan Trip'}
-                    </Link>
-                  </div>
+                  {/* ── Single full-width Explore button ── */}
+                  <Link
+                    href={`/destinations/${dest.slug}`}
+                    className="block w-full bg-green text-white text-center text-[14px] font-semibold py-[14px] rounded-md active:opacity-80 transition-opacity"
+                  >
+                    {lang === 'mm' ? 'ကြည့်ရှုရန်' : 'Explore'}
+                  </Link>
                 </div>
               </div>
             )
