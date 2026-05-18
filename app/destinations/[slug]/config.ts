@@ -30,26 +30,26 @@ export interface DestinationConfig {
 export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
   ngwesaung: {
     heroImage:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=85&auto=format&fit=crop',
+      'https://upload.wikimedia.org/wikipedia/commons/2/29/Ngwe_Saung_beach_05.jpg',
     galleryImages: [
       {
-        src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Ngwe_Saung_beach_05.jpg',
         alt: 'White sand beach',
       },
       {
-        src: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Ngwe_Saung_Beach_from_Lovers_island.jpg',
         alt: 'Clear ocean waters',
       },
       {
-        src: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Lover_island.jpg',
         alt: 'Beach at sunset',
       },
       {
-        src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Ngwe_Saung_Beach.jpg',
         alt: 'Beachside activities',
       },
       {
-        src: 'https://images.unsplash.com/photo-1439130490301-25e322d88054?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Ngwe-Saung_Banner.jpg',
         alt: 'Fishing village',
       },
     ],
@@ -67,26 +67,26 @@ export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
   },
   'chaung-thar': {
     heroImage:
-      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=85&auto=format&fit=crop',
+      'https://upload.wikimedia.org/wikipedia/commons/e/eb/20170304_084223-01_Chaungtha_beach.jpg',
     galleryImages: [
       {
-        src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/20170304_084223-01_Chaungtha_beach.jpg',
         alt: 'Chaung Thar beach',
       },
       {
-        src: 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/ChaungThaBeach.JPG',
         alt: 'Golden sunset over the bay',
       },
       {
-        src: 'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Chaungthabeach.jpg',
         alt: 'Sandy shoreline',
       },
       {
-        src: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/2/27/Myanmar_Traditional_Boat_in_front_of_a_Hotel_in_Chaung_Tha_Beach.JPG',
         alt: 'Tropical beach scenery',
       },
       {
-        src: 'https://images.unsplash.com/photo-1484821582734-6692f86aee4c?w=600&q=80&auto=format&fit=crop',
+        src: 'https://upload.wikimedia.org/wikipedia/commons/7/7f/Pagoda_at_Chaung_Tha_Beach.JPG',
         alt: 'Beach at dusk',
       },
     ],
