@@ -15,7 +15,15 @@ interface Props {
 
 const DESTINATION_META: Record<
   string,
-  { heroImage: string; nights: string; rating: string; tagline: string; distance: string }
+   {
+    heroImage: string
+    nights: string
+    rating: string
+    tagline: string
+    distance: string
+    description: string
+    highlights: string[]
+  }
 > = {
   ngwesaung: {
     heroImage:
@@ -24,6 +32,9 @@ const DESTINATION_META: Record<
     rating: '4.8',
     tagline: "Myanmar's most popular beach",
     distance: '5 hrs from Yangon',
+    description:
+      "A 20km stretch of untouched white sand on the Bay of Bengal. One of Myanmar's most beautiful and least-developed beaches.",
+    highlights: ['20km White Sand Beach', 'Crystal Clear Waters', 'Fresh Seafood', 'Water Sports'],
   },
   'chaung-thar': {
     heroImage:
@@ -32,6 +43,9 @@ const DESTINATION_META: Record<
     rating: '4.6',
     tagline: "Myanmar's most loved local beach",
     distance: '5 hrs from Yangon',
+    description:
+      "A lively beach town on the Bay of Bengal known for easy access, local vibes, and relaxing coastal escapes.",
+    highlights: ['Soft Sandy Shore', 'Sunset Views', 'Family Friendly', 'Seafood Spots'],
   },
 }
 
@@ -139,16 +153,15 @@ export default function DestinationsClient({ destinations }: Props) {
                   </div>
 
                   {/* Description */}
-                  {dest.description && (
-                    <p className="text-[13px] text-ink2 font-light leading-[1.55] mb-3 line-clamp-2">
-                      {dest.description}
-                    </p>
-                  )}
+                <p className="text-[13px] text-ink2 font-light leading-[1.55] mb-3 line-clamp-2">
+                    {meta.description}
+                  </p>
+
 
                   {/* Highlight tags */}
-                  {dest.highlights && dest.highlights.length > 0 && (
+                  {meta.highlights.length > 0 && (
                     <div className="flex flex-wrap gap-[6px] mb-4">
-                      {dest.highlights.slice(0, 4).map((tag: string) => (
+                      {meta.highlights.slice(0, 4).map((tag: string) => (
                         <span
                           key={tag}
                           className="text-[11px] bg-green-pale text-green px-[10px] py-[4px] rounded-full font-medium"
