@@ -20,18 +20,18 @@ const DESTINATION_META: Record<
   ngwesaung: {
     heroImage:
       'https://upload.wikimedia.org/wikipedia/commons/2/29/Ngwe_Saung_beach_05.jpg',
-    nights: '2–7 nights',
+    nights: 'Available',
     rating: '4.8',
-    tagline: "Myanmar's most beautiful beach",
+    tagline: "Myanmar's most popular beach",
     distance: '5 hrs from Yangon',
   },
   'chaung-thar': {
     heroImage:
       'https://upload.wikimedia.org/wikipedia/commons/e/eb/20170304_084223-01_Chaungtha_beach.jpg',
-    nights: '2–5 nights',
+    nights: 'Available',
     rating: '4.6',
     tagline: "Myanmar's most loved local beach",
-    distance: '4 hrs from Yangon',
+    distance: '5 hrs from Yangon',
   },
 }
 
@@ -126,7 +126,7 @@ export default function DestinationsClient({ destinations }: Props) {
                   {/* Quick stats */}
                   <div className="flex items-center gap-3 mb-3">
                     <span className="text-[12px] text-ink2">
-                      🌙 <span className="font-medium text-ink">{meta.nights}</span>
+                      ✅ <span className="font-medium text-ink">{meta.nights}</span>
                     </span>
                     <span className="w-[3px] h-[3px] rounded-full bg-border2" />
                     <span className="text-[12px] text-ink2">
