@@ -21,9 +21,12 @@ export interface DestinationConfig {
   badgeTags: string[]
   bestTime: string
   planLabel: string
-  rating: string
-  nights: string
-  distance: string
+  /** Google Maps place query for the static map thumbnail & directions link */
+  mapQuery: string
+  /** Full Google Maps directions URL (leave destination blank so it routes from user location) */
+  mapsDirectionsUrl: string
+  /** Human-readable location label shown in the map card */
+  locationLabel: string
 }
 
 /* ─── Static config per destination ────────────────────────────── */
@@ -61,9 +64,9 @@ export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
     badgeTags: ['20km White Sand', "Lover's Island", 'Luxury Resorts', 'Fresh Seafood', 'Water Sports', 'Peaceful'],
     bestTime: 'November — April (Dry Season)',
     planLabel: 'Plan My Ngwe Saung Trip',
-    rating: '4.8',
-    nights: '2–7 nights',
-    distance: '5 hrs from Yangon',
+    mapQuery: 'Ngwe+Saung+Beach,Myanmar',
+    mapsDirectionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=Ngwe+Saung+Beach,Myanmar',
+    locationLabel: 'Ngwe Saung, Ayeyarwady Region',
   },
   'chaung-thar': {
     heroImage:
@@ -98,8 +101,8 @@ export const DESTINATION_CONFIG: Record<string, DestinationConfig> = {
     badgeTags: ['Long Sandy Beach', 'Seafood Restaurants', 'Budget Friendly', 'Bungalow Resorts', 'Stunning Sunsets', 'Local Atmosphere'],
     bestTime: 'November — April (Dry Season)',
     planLabel: 'Plan My Chaung Thar Trip',
-    rating: '4.6',
-    nights: '2–5 nights',
-    distance: '4 hrs from Yangon',
+    mapQuery: 'Chaung+Thar+Beach,Myanmar',
+    mapsDirectionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=Chaung+Thar+Beach,Myanmar',
+    locationLabel: 'Chaung Thar, Ayeyarwady Region',
   },
 }
