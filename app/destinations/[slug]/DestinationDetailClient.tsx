@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
@@ -52,7 +52,6 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
 
   return (
     <div className="bg-surface border border-border rounded-lg overflow-hidden shadow-sm">
-      {/* Always-visible header row */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-[14px] text-left active:bg-surface2 transition-colors"
@@ -79,8 +78,6 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
             )}
           </div>
         </div>
-
-        {/* Chevron */}
         <div
           className={`flex-shrink-0 w-7 h-7 rounded-full bg-surface2 border border-border flex items-center justify-center transition-transform duration-200 ${
             open ? 'rotate-180' : ''
@@ -96,7 +93,6 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
         </div>
       </button>
 
-      {/* Accordion body */}
       {open && rooms.length > 0 && (
         <div className="border-t border-border bg-surface2/60 px-4 py-3 flex flex-col gap-[10px]">
           {rooms.map((room) => (
@@ -120,6 +116,224 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
   )
 }
 
+/* ─── Centered Carousel ─────────────────────────────────────────── */
+const AUTOPLAY_INTERVAL = 3500
+
+function GalleryCarousel({
+  images,
+  label,
+}: {
+  images: DestinationConfig['galleryImages']
+  label: string
+}) {
+  const [active, setActive] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const total = images.length
+
+  const advance = useCallback(
+    (dir: 1 | -1) => {
+      setActive((prev) => (prev + dir + total) % total)
+    },
+    [total]
+  )
+
+  /* autoplay */
+  useEffect(() => {
+    if (paused) return
+    timerRef.current = setInterval(() => advance(1), AUTOPLAY_INTERVAL)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [paused, advance])
+
+  function handleUserNav(idx: number) {
+    setActive(idx)
+    setPaused(true)
+    // resume after 6s of inactivity
+    setTimeout(() => setPaused(false), 6000)
+  }
+
+  /* drag / swipe */
+  const dragStart = useRef<number | null>(null)
+
+  function onDragStart(x: number) { dragStart.current = x }
+  function onDragEnd(x: number) {
+    if (dragStart.current === null) return
+    const delta = dragStart.current - x
+    if (Math.abs(delta) > 40) handleUserNav((active + (delta > 0 ? 1 : -1) + total) % total)
+    dragStart.current = null
+  }
+
+  const leftIdx  = (active - 1 + total) % total
+  const rightIdx = (active + 1) % total
+
+  /* visible cards: [left, center, right] */
+  const cards = [
+    { idx: leftIdx,  position: 'left'   as const },
+    { idx: active,   position: 'center' as const },
+    { idx: rightIdx, position: 'right'  as const },
+  ]
+
+  return (
+    <section>
+      <h2 className="text-[16px] font-semibold text-ink tracking-[-0.2px] mb-3">
+        {label}
+      </h2>
+
+      {/* Track */}
+      <div
+        className="relative flex items-center justify-center gap-3 h-[220px] overflow-hidden select-none"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onMouseDown={(e) => onDragStart(e.clientX)}
+        onMouseUp={(e) => onDragEnd(e.clientX)}
+        onTouchStart={(e) => onDragStart(e.touches[0].clientX)}
+        onTouchEnd={(e) => onDragEnd(e.changedTouches[0].clientX)}
+      >
+        {cards.map(({ idx, position }) => {
+          const img = images[idx]
+          const isCenter = position === 'center'
+          const isSide   = !isCenter
+
+          return (
+            <button
+              key={`${position}-${idx}`}
+              onClick={() => handleUserNav(idx)}
+              aria-label={isCenter ? img.alt : `View ${img.alt}`}
+              className={[
+                'relative rounded-xl overflow-hidden flex-shrink-0 transition-all duration-400 ease-out border shadow-sm focus:outline-none',
+                isCenter
+                  ? 'w-[188px] h-[210px] border-green/40 shadow-md z-10'
+                  : 'w-[130px] h-[165px] border-border opacity-55 hover:opacity-70 cursor-pointer z-0',
+              ].join(' ')}
+              style={{
+                transitionProperty: 'width, height, opacity, box-shadow',
+                transitionDuration: '350ms',
+              }}
+            >
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                className="object-cover"
+                sizes={isCenter ? '188px' : '130px'}
+                draggable={false}
+              />
+              {/* subtle vignette on side cards */}
+              {isSide && (
+                <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/30 pointer-events-none" />
+              )}
+              {/* active indicator ring */}
+              {isCenter && (
+                <div className="absolute inset-0 ring-2 ring-inset ring-green/30 rounded-xl pointer-events-none" />
+              )}
+            </button>
+          )
+        })}
+
+        {/* Prev / Next buttons (hidden on mobile, show on wider screens) */}
+        <button
+          onClick={() => handleUserNav((active - 1 + total) % total)}
+          aria-label="Previous photo"
+          className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow items-center justify-center text-ink2 hover:bg-white transition-colors z-20"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        <button
+          onClick={() => handleUserNav((active + 1) % total)}
+          aria-label="Next photo"
+          className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow items-center justify-center text-ink2 hover:bg-white transition-colors z-20"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Pagination dots */}
+      <div className="flex items-center justify-center gap-[6px] mt-3" role="tablist" aria-label="Gallery navigation">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            role="tab"
+            aria-selected={i === active}
+            aria-label={`Photo ${i + 1}`}
+            onClick={() => handleUserNav(i)}
+            className={[
+              'rounded-full transition-all duration-300',
+              i === active
+                ? 'w-5 h-[6px] bg-green'
+                : 'w-[6px] h-[6px] bg-border hover:bg-ink3',
+            ].join(' ')}
+          />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/* ─── Compact Map Section ───────────────────────────────────────── */
+function MapSection({ config, lang }: { config: DestinationConfig; lang: string }) {
+  const staticMapSrc = `https://maps.googleapis.com/maps/api/staticmap?center=${config.mapQuery}&zoom=10&size=480x160&maptype=roadmap&markers=color:green|${config.mapQuery}&key=AIzaSyD-PLACEHOLDER`
+  // We intentionally use an OpenStreetMap tile embed instead — no API key needed and lightweight
+  // Lat/lng approximations for the two beaches:
+  const embedSrc = config.mapQuery.includes('Ngwe')
+    ? 'https://www.openstreetmap.org/export/embed.html?bbox=94.9,16.8,95.2,17.1&layer=mapnik&marker=16.942,95.062'
+    : 'https://www.openstreetmap.org/export/embed.html?bbox=94.4,17.8,94.7,18.0&layer=mapnik&marker=17.869,94.564'
+
+  return (
+    <div className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm">
+      {/* Map thumbnail — lightweight OSM iframe, clipped to a fixed height */}
+      <div className="relative h-[110px] w-full overflow-hidden pointer-events-none">
+        <iframe
+          src={embedSrc}
+          title="Location map"
+          className="absolute inset-0 w-full h-full border-0 scale-[1.02]"
+          loading="lazy"
+          aria-hidden="true"
+        />
+        {/* slight top fade so it blends into the card */}
+        <div className="absolute inset-0 bg-gradient-to-b from-surface/30 to-transparent pointer-events-none" />
+      </div>
+
+      {/* Bottom row: label + CTA */}
+      <div className="flex items-center justify-between px-4 py-[11px] border-t border-border">
+        <div className="flex items-center gap-[8px] min-w-0">
+          {/* Map pin icon */}
+          <span className="flex-shrink-0 w-[28px] h-[28px] rounded-full bg-green-pale flex items-center justify-center">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
+          </span>
+          <div className="min-w-0">
+            <p className="text-[12px] font-semibold text-ink leading-tight truncate">
+              {config.locationLabel}
+            </p>
+            <p className="text-[10px] text-ink3 leading-tight mt-[1px]">
+              {lang === 'mm' ? 'မြေပုံတွင်ကြည့်ရန်' : 'View on map'}
+            </p>
+          </div>
+        </div>
+
+        <a
+          href={config.mapsDirectionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Get directions to ${config.locationLabel}`}
+          className="flex-shrink-0 flex items-center gap-[5px] bg-green text-white text-[11px] font-semibold px-[12px] py-[7px] rounded-lg active:opacity-80 transition-opacity shadow-sm"
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+          </svg>
+          {lang === 'mm' ? 'လမ်းညွှန်' : 'Directions'}
+        </a>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Main client component ─────────────────────────────────────── */
 export default function DestinationDetailClient({
   destination,
@@ -134,13 +348,6 @@ export default function DestinationDetailClient({
       <Navbar onMenuOpen={() => setDrawerOpen(true)} />
       <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} user={null} />
 
-      {/*
-        Bottom padding breakdown:
-        - BottomNav:   ~64px
-        - Sticky CTA:  ~72px (button 52px + padding 20px)
-        - Safe area:   env(safe-area-inset-bottom) — up to 34px on iPhone
-        Total: 160px is safe for all devices
-      */}
       <main className="max-w-[480px] mx-auto pb-[160px] bg-bg">
 
         {/* ── 1. Hero ───────────────────────────────────────────── */}
@@ -155,7 +362,6 @@ export default function DestinationDetailClient({
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/85" />
 
-          {/* Back button */}
           <Link
             href="/destinations"
             aria-label="Back to destinations"
@@ -170,7 +376,6 @@ export default function DestinationDetailClient({
             </svg>
           </Link>
 
-          {/* Name + badge tags */}
           <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
             <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-white/60 mb-[4px]">
               {destination.region}
@@ -191,22 +396,9 @@ export default function DestinationDetailClient({
           </div>
         </div>
 
-        {/* ── 2. Quick Stats Bar ───────────────────────────────── */}
-        <div className="bg-surface border-b border-border px-4 py-[14px] grid grid-cols-4 divide-x divide-border">
-          {[
-            { icon: '⭐', value: config.rating,   label: lang === 'mm' ? 'အဆင့်'   : 'Rating'      },
-            { icon: '🌙', value: config.nights,   label: lang === 'mm' ? 'နေမည်'   : 'Stay'        },
-            { icon: '🚌', value: config.distance, label: lang === 'mm' ? 'ရောက်ရန်' : 'From Yangon' },
-            { icon: '☀️', value: 'Nov–Apr',       label: lang === 'mm' ? 'အချိန်'   : 'Best Time'  },
-          ].map(({ icon, value, label }) => (
-            <div key={label} className="flex flex-col items-center gap-[2px] px-1">
-              <span className="text-[17px] leading-none">{icon}</span>
-              <span className="text-[11px] font-semibold text-ink text-center leading-tight mt-[2px]">
-                {value}
-              </span>
-              <span className="text-[9px] text-ink3 text-center leading-tight">{label}</span>
-            </div>
-          ))}
+        {/* ── 2. Compact Map Section ───────────────────────────── */}
+        <div className="px-[18px] pt-4">
+          <MapSection config={config} lang={lang} />
         </div>
 
         <div className="px-[18px] pt-5 flex flex-col gap-5">
@@ -267,7 +459,6 @@ export default function DestinationDetailClient({
               ))}
             </div>
 
-            {/* Best time chip */}
             <div className="mt-4 bg-amber-pale rounded-md px-3 py-[10px] flex items-center gap-3">
               <span className="text-[20px] leading-none">☀️</span>
               <div>
@@ -279,29 +470,11 @@ export default function DestinationDetailClient({
             </div>
           </section>
 
-          {/* ── 5. Gallery — horizontal scroll ───────────────── */}
-          <section>
-            <h2 className="text-[16px] font-semibold text-ink tracking-[-0.2px] mb-3">
-              {lang === 'mm' ? 'ဓာတ်ပုံများ' : 'Gallery'}
-            </h2>
-            <div className="-mx-[18px] px-[18px] flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-              {config.galleryImages.map((img) => (
-                <div
-                  key={img.src}
-                  className="relative flex-shrink-0 w-[155px] h-[205px] rounded-lg overflow-hidden border border-border shadow-sm"
-                >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    className="object-cover"
-                    sizes="155px"
-                  />
-                </div>
-              ))}
-              <div className="flex-shrink-0 w-[2px]" />
-            </div>
-          </section>
+          {/* ── 5. Gallery — centered carousel ───────────────── */}
+          <GalleryCarousel
+            images={config.galleryImages}
+            label={lang === 'mm' ? 'ဓာတ်ပုံများ' : 'Gallery'}
+          />
 
           {/* ── 6. DB Highlights grid ────────────────────────── */}
           {destination.highlights && destination.highlights.length > 0 && (
@@ -326,12 +499,6 @@ export default function DestinationDetailClient({
         </div>
       </main>
 
-      {/* ── Sticky CTA bar ───────────────────────────────────────────
-          Sits directly on top of BottomNav.
-          BottomNav is fixed at bottom-0 with height ~64px.
-          We position this at bottom-[64px] and add safe-area padding
-          so it never overlaps on iPhone notch devices.
-      ──────────────────────────────────────────────────────────────── */}
       <div
         className="fixed left-0 right-0 z-40 max-w-[480px] mx-auto px-[18px] pt-[10px] pb-[10px] bg-bg/95 backdrop-blur-[10px] border-t border-border no-print"
         style={{ bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
