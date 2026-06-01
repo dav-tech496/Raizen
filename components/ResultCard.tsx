@@ -21,6 +21,9 @@ const TIER_STYLES: Record<string, string> = {
   boutique:    'bg-[#D1FAE5] text-[#065F46]',
 }
 
+const VIBER_NUMBER = '09751067759'
+const VIBER_DEEP_LINK = `viber://chat?number=%2B959751067759`
+
 export default function ResultCard({ result, onSave, isSaving }: Props) {
   const { lang, t } = useLang()
   const isEn = lang !== 'mm'
@@ -136,6 +139,61 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
           </div>
         ))
       )}
+
+      {/* Viber Contact Box */}
+      <div className="bg-[#EEF9EE] border border-[#7360F2]/20 rounded-md overflow-hidden mb-4 shadow-sm">
+        <div className="flex items-center gap-3 px-4 py-[13px] border-b border-[#7360F2]/15 bg-[#7360F2]/8">
+          <div className="w-[38px] h-[38px] rounded-full bg-[#7360F2] flex items-center justify-center flex-shrink-0">
+            {/* Viber icon */}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.4 0.9C8.5 1.1 5.8 2.3 3.8 4.4C1.6 6.6 0.5 9.6 0.7 12.7C0.8 14.9 1.6 17 3 18.7V22.4C3 22.8 3.3 23.1 3.7 23.1H3.8L7.4 22.1C8.7 22.6 10.1 22.9 11.5 22.9C14.6 22.9 17.5 21.7 19.7 19.5C21.9 17.3 23.1 14.4 23.1 11.3C23.2 5.2 17.9 0.5 11.4 0.9ZM17.1 17.3C15.3 19.1 12.9 20.1 10.3 20C9.2 20 8.1 19.8 7 19.4L6.7 19.3L4.7 19.9V17.8L4.5 17.6C2.1 14.8 2 10.7 4.3 7.8C6.4 5.1 9.8 3.8 13.2 4.3C16.4 4.8 19 7.1 19.8 10.2C20.5 13 19.5 16 17.1 17.3Z"/>
+              <path d="M16.5 13.8L14.8 13C14.6 12.9 14.3 12.9 14.1 13L13.3 13.8C13.1 14 12.8 14.1 12.5 14C11.4 13.5 10.3 12.8 9.5 11.9C8.7 11.1 8.1 10.1 7.7 9.1C7.6 8.8 7.7 8.5 7.9 8.3L8.7 7.5C8.9 7.3 8.9 7 8.8 6.8L8 5.1C7.8 4.8 7.4 4.7 7.1 4.9C6.3 5.3 5.6 6 5.4 6.9C5 8.4 5.5 10.4 7.4 12.4C9.3 14.4 11.4 15.4 13 15.2C13.9 15.1 14.7 14.5 15.1 13.6C15.3 13.3 15.2 12.9 14.9 12.7L16.5 13.8Z"/>
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[14px] font-semibold text-[#3D2D8E] leading-snug">
+              {isEn ? 'Need help booking this trip?' : 'ခရီးစဉ် ကြိုတင်မှာကြားရန် အကူအညီလိုပါသလား?'}
+            </div>
+          </div>
+        </div>
+
+        <div className="px-4 py-[14px]">
+          <p className="text-[12px] text-ink2 font-light mb-[14px] leading-[1.55]">
+            {isEn
+              ? 'Contact us on Viber for transport, hotel, and trip arrangement support.'
+              : 'ပို့ဆောင်ရေး၊ တည်းခိုခန်း နှင့် ခရီးစဉ် စီစဉ်မှုများအတွက် Viber မှ ဆက်သွယ်ပါ။'}
+          </p>
+
+          {/* Phone numbers — tappable */}
+          <div className="flex flex-col gap-[7px] mb-[14px]">
+            {[VIBER_NUMBER, '+959751067759'].map((num) => (
+              <a
+                key={num}
+                href={`tel:${num}`}
+                className="flex items-center gap-2 text-[13px] font-medium text-[#3D2D8E] active:opacity-70"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 text-[#7360F2]">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .86h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.79a16 16 0 006.12 6.12l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+                </svg>
+                {num}
+              </a>
+            ))}
+          </div>
+
+          {/* Viber CTA button */}
+          <a
+            href={VIBER_DEEP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full bg-[#7360F2] text-white text-[13px] font-semibold py-[13px] rounded-md active:opacity-80 transition-opacity"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.4 0.9C8.5 1.1 5.8 2.3 3.8 4.4C1.6 6.6 0.5 9.6 0.7 12.7C0.8 14.9 1.6 17 3 18.7V22.4C3 22.8 3.3 23.1 3.7 23.1H3.8L7.4 22.1C8.7 22.6 10.1 22.9 11.5 22.9C14.6 22.9 17.5 21.7 19.7 19.5C21.9 17.3 23.1 14.4 23.1 11.3C23.2 5.2 17.9 0.5 11.4 0.9ZM17.1 17.3C15.3 19.1 12.9 20.1 10.3 20C9.2 20 8.1 19.8 7 19.4L6.7 19.3L4.7 19.9V17.8L4.5 17.6C2.1 14.8 2 10.7 4.3 7.8C6.4 5.1 9.8 3.8 13.2 4.3C16.4 4.8 19 7.1 19.8 10.2C20.5 13 19.5 16 17.1 17.3Z"/>
+            </svg>
+            {isEn ? 'Contact on Viber' : 'Viber မှ ဆက်သွယ်ရန်'}
+          </a>
+        </div>
+      </div>
 
       {/* Day plans */}
       <h3 className="text-base font-semibold text-ink tracking-[-0.25px] mb-3 mt-2">{t('dayByDay')}</h3>
