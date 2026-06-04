@@ -73,7 +73,6 @@ export default function PlannerClient({ destinations, hotels, transports, templa
 
     const planResult = buildPlanResult(values, filteredHotels, filteredTransports, filteredTemplates)
 
-    // Resolve destination display name
     const destName =
       destinations.find((d) => d.id === values.destinationId)?.name ?? values.destinationSlug
     planResult.destinationName = destName
@@ -89,7 +88,6 @@ export default function PlannerClient({ destinations, hotels, transports, templa
   async function handleSave() {
     if (!result) return
 
-    // Check auth via browser client (no server cookies needed)
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -100,7 +98,6 @@ export default function PlannerClient({ destinations, hotels, transports, templa
 
     setIsSaving(true)
     try {
-      // Use the API route so server cookies are handled server-side
       const res = await fetch('/api/itineraries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,23 +135,89 @@ export default function PlannerClient({ destinations, hotels, transports, templa
       <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} user={null} />
 
       <main className="max-w-[480px] mx-auto pb-[90px]">
-        {/* Planner hero */}
+
+        {/* ── Planner hero with floating bubbles ── */}
         <div
           className="px-[18px] py-7 relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg,#1B3A2F 0%,#0D2318 100%)' }}
+          style={{ background: 'linear-gradient(135deg, #991B1B 0%, #7F1D1D 100%)' }}
         >
-          <div className="text-[11px] font-medium tracking-[0.09em] uppercase text-green-light mb-2">
-            {lang === 'mm' ? 'ခရီးစဉ်စီစဉ်သူ' : 'Trip Planner'}
+          {/* Floating bubbles — same pattern as Home/Destinations */}
+          <div
+            className="absolute rounded-full opacity-[0.12] pointer-events-none"
+            style={{
+              width: 180,
+              height: 180,
+              background: 'radial-gradient(circle, #EF4444, transparent)',
+              top: -50,
+              right: -40,
+              animation: 'floatBubble1 7s ease-in-out infinite',
+            }}
+          />
+          <div
+            className="absolute rounded-full opacity-[0.10] pointer-events-none"
+            style={{
+              width: 120,
+              height: 120,
+              background: 'radial-gradient(circle, #DC2626, transparent)',
+              bottom: -30,
+              left: -20,
+              animation: 'floatBubble2 9s ease-in-out infinite',
+            }}
+          />
+          <div
+            className="absolute rounded-full opacity-[0.08] pointer-events-none"
+            style={{
+              width: 80,
+              height: 80,
+              background: 'radial-gradient(circle, #FCA5A5, transparent)',
+              top: 20,
+              left: '45%',
+              animation: 'floatBubble3 6s ease-in-out infinite',
+            }}
+          />
+          <div
+            className="absolute rounded-full opacity-[0.07] pointer-events-none"
+            style={{
+              width: 55,
+              height: 55,
+              background: 'radial-gradient(circle, #F87171, transparent)',
+              bottom: 10,
+              right: '25%',
+              animation: 'floatBubble1 8s ease-in-out infinite reverse',
+            }}
+          />
+
+          {/* Hero text — sits above bubbles */}
+          <div className="relative z-10">
+            <div className="text-[11px] font-medium tracking-[0.09em] uppercase text-red-300 mb-2">
+              {lang === 'mm' ? 'ခရီးစဉ်စီစဉ်သူ' : 'Trip Planner'}
+            </div>
+            <h1 className="text-[24px] font-semibold text-white tracking-[-0.4px] mb-[6px]">
+              {lang === 'mm' ? 'သင့်မြန်မာနိုင်ငံ ခရီးစဉ်စီစဉ်ပါ' : 'Plan Your Myanmar Trip'}
+            </h1>
+            <p className="text-[13px] text-white/55 font-light leading-[1.55]">
+              {lang === 'mm'
+                ? 'သင့်နှစ်သက်မှုများကို ဖော်ပြပါ၊ ကိုက်ညီသောဟိုတယ်များနှင့် ဘတ်စ်ကားလက်မှတ်စျေးနှုန်းများ ပြသမည်'
+                : "Tell us your preferences and we'll show matched hotels and bus ticket prices."}
+            </p>
           </div>
-          <h1 className="text-[24px] font-semibold text-white tracking-[-0.4px] mb-[6px]">
-            {lang === 'mm' ? 'သင့်မြန်မာနိုင်ငံ ခရီးစဉ်စီစဉ်ပါ' : 'Plan Your Myanmar Trip'}
-          </h1>
-          <p className="text-[13px] text-white/55 font-light leading-[1.55]">
-            {lang === 'mm'
-              ? 'သင့်နှစ်သက်မှုများကို ဖော်ပြပါ၊ ကိုက်ညီသောဟိုတယ်များနှင့် ဘတ်စ်ကားလက်မှတ်စျေးနှုန်းများ ပြသမည်'
-              : "Tell us your preferences and we'll show matched hotels and bus ticket prices."}
-          </p>
         </div>
+
+        {/* Bubble keyframes — injected once */}
+        <style>{`
+          @keyframes floatBubble1 {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50%       { transform: translateY(-14px) scale(1.04); }
+          }
+          @keyframes floatBubble2 {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50%       { transform: translateY(-10px) scale(1.06); }
+          }
+          @keyframes floatBubble3 {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50%       { transform: translateY(-18px) scale(0.97); }
+          }
+        `}</style>
 
         <PlannerForm
           destinations={destinations}
