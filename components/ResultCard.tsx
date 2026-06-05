@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { useLang } from '@/context/LangContext'
 import { formatMMK } from '@/lib/plannerLogic'
 import { generateItineraryPDF } from '@/lib/pdfGenerator'
+import { useWeather } from '@/hooks/useWeather'
 import type { PlanResult } from '@/types'
 
 interface Props {
@@ -24,10 +25,10 @@ const TIER_STYLES: Record<string, string> = {
 const VIBER_NUMBER = '09751067759'
 const VIBER_DEEP_LINK = `viber://chat?number=%2B959751067759`
 
-// Season/weather info per destination slug
-const DEST_SEASON: Record<string, { icon: string; season: string; desc: string; temp: string }> = {
-  ngwesaung:     { icon: '☀️', season: 'Nov — Apr · Dry Season', desc: 'Clear skies, calm sea, perfect for beach', temp: '32°C' },
-  'chaung-thar': { icon: '☀️', season: 'Nov — Apr · Dry Season', desc: 'Golden sunsets, warm water, low crowds', temp: '31°C' },
+// Static season label per destination (real temp comes from API)
+const DEST_SEASON: Record<string, { season: string; desc: string }> = {
+  ngwesaung:     { season: 'Nov — Apr · Dry Season', desc: 'Clear skies, calm sea, perfect for beach' },
+  'chaung-thar': { season: 'Nov — Apr · Dry Season', desc: 'Golden sunsets, warm water, low crowds' },
 }
 
 // Local tips per destination
@@ -72,8 +73,9 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
     ? 'ngwesaung'
     : 'chaung-thar'
 
-  const season = DEST_SEASON[destSlug]
-  const tips   = DEST_TIPS[destSlug] ?? []
+  const season  = DEST_SEASON[destSlug]
+  const tips    = DEST_TIPS[destSlug] ?? []
+  const weather = useWeather(destSlug)
 
   return (
     <div className="px-[18px] py-6 animate-fade-up flex flex-col gap-[14px]">
@@ -98,21 +100,38 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
         </div>
       </div>
 
-      {/* ── Weather / best season ── */}
+      {/* ── Weather / best season (real-time) ── */}
       {season && (
         <div
           className="rounded-md px-4 py-[14px] flex items-center gap-[14px]"
           style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #1e4080 100%)' }}
         >
-          <span className="text-[30px]">{season.icon}</span>
+          <span className="text-[30px]">
+            {weather.loading ? '🌡' : weather.error ? '☀️' : weather.icon}
+          </span>
           <div className="flex-1">
             <div className="text-[10px] font-semibold tracking-[0.07em] uppercase text-white/60 mb-[2px]">
               {isEn ? 'Best Travel Season' : 'အကောင်းဆုံး ခရီးသွားချိန်'}
             </div>
             <div className="text-[14px] font-semibold text-white">{season.season}</div>
-            <div className="text-[11px] text-white/55 mt-[2px]">{season.desc}</div>
+            <div className="text-[11px] text-white/55 mt-[2px]">
+              {!weather.loading && !weather.error
+                ? `${weather.description.charAt(0).toUpperCase() + weather.description.slice(1)} · ${weather.humidity}% humidity`
+                : season.desc}
+            </div>
           </div>
-          <div className="text-[22px] font-bold text-white">{season.temp}</div>
+          <div className="text-right">
+            {weather.loading ? (
+              <div className="text-[13px] text-white/50 animate-pulse">…°C</div>
+            ) : weather.error ? (
+              <div className="text-[13px] text-white/40">–</div>
+            ) : (
+              <>
+                <div className="text-[22px] font-bold text-white leading-none">{weather.temp}°</div>
+                <div className="text-[10px] text-white/50 mt-[2px]">Live · °C</div>
+              </>
+            )}
+          </div>
         </div>
       )}
 
