@@ -5,6 +5,7 @@ import { useLang } from '@/context/LangContext'
 import { formatMMK } from '@/lib/plannerLogic'
 import { generateItineraryPDF } from '@/lib/pdfGenerator'
 import { useWeather } from '@/hooks/useWeather'
+import DestinationMapCard from '@/components/DestinationMapCard'
 import type { PlanResult } from '@/types'
 
 interface Props {
@@ -80,25 +81,8 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
   return (
     <div className="px-[18px] py-6 animate-fade-up flex flex-col gap-[14px]">
 
-      {/* ── Result header ── */}
-      <div className="bg-green-pale border border-green/20 rounded-md px-4 py-[14px]">
-        <h2 className="text-[18px] font-semibold text-ink tracking-[-0.35px] mb-[3px]">
-          {isEn
-            ? `Your ${result.days}-Day ${result.destinationName} Trip`
-            : `သင့် ${result.days} ရက် ${result.destinationName} ခရီးစဉ်`}
-        </h2>
-        <p className="text-[12px] text-ink2 font-light">
-          {isEn ? result.travelerLabel.en : result.travelerLabel.mm}
-          {' · '}
-          {isEn ? result.departureLabel.en : result.departureLabel.mm}
-        </p>
-        <div className="flex flex-wrap gap-[6px] mt-[10px]">
-          <span className="text-[10px] font-semibold bg-green/10 text-green rounded-full px-[9px] py-[3px]">🏖 Beach</span>
-          <span className="text-[10px] font-semibold bg-green/10 text-green rounded-full px-[9px] py-[3px]">🚌 Bus included</span>
-          <span className="text-[10px] font-semibold bg-green/10 text-green rounded-full px-[9px] py-[3px]">🏨 Hotel matched</span>
-          <span className="text-[10px] font-semibold bg-green/10 text-green rounded-full px-[9px] py-[3px]">📄 PDF ready</span>
-        </div>
-      </div>
+      {/* ── Map card (replaces pink result header) ── */}
+      <DestinationMapCard slug={destSlug} />
 
       {/* ── Weather / best season (real-time) ── */}
       {season && (
@@ -168,16 +152,12 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
             {t('hotelEstimate')} ({result.days} {t('nights')})
           </span>
           <span className="font-semibold text-ink">
-            {result.cheapestHotelTotal > 0
-              ? `${formatMMK(result.cheapestHotelTotal)} MMK`
-              : (isEn ? 'No match' : 'ကိုက်ညီမှုမရှိ')}
+            {result.cheapestHotelTotal > 0 ? `${formatMMK(result.cheapestHotelTotal)} MMK` : '—'}
           </span>
         </div>
-        <div className="flex justify-between items-center px-4 py-[12px] bg-green-pale">
-          <span className="text-sm font-semibold text-green">{t('estimatedTotal')}</span>
-          <span className="text-[22px] font-bold text-green tracking-[-0.4px]">
-            {formatMMK(result.totalCost)} MMK
-          </span>
+        <div className="flex justify-between items-center px-4 py-[12px] text-[14px]">
+          <span className="font-semibold text-ink">{t('estimatedTotal')}</span>
+          <span className="font-bold text-green text-[16px]">{formatMMK(result.totalCost)} MMK</span>
         </div>
       </div>
 
@@ -185,11 +165,17 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
       <div>
         <h3 className="text-base font-semibold text-ink tracking-[-0.25px] mb-3">{t('matchedHotels')}</h3>
         {result.matchedHotels.length === 0 ? (
-          <p className="text-sm text-ink2 bg-surface2 rounded-md p-4">{t('noHotelsFound')}</p>
+          <div className="bg-surface border border-border rounded-md px-4 py-[14px] text-center">
+            <p className="text-[13px] text-ink3">
+              {isEn
+                ? 'No hotels matched your budget. Try increasing your daily budget.'
+                : 'ဘတ်ဂျက်နှင့် ကိုက်ညီသော ဟိုတယ် မရှိပါ။ ဘတ်ဂျက် တိုးစမ်းကြည့်ပါ။'}
+            </p>
+          </div>
         ) : (
           result.matchedHotels.map((hotel) => (
             <div key={hotel.name} className="bg-surface border border-border rounded-md overflow-hidden mb-[11px] shadow-sm">
-              <div className="flex items-start justify-between px-4 py-[14px] border-b border-border">
+              <div className="flex items-center justify-between px-4 py-[13px] border-b border-border">
                 <div>
                   <div className="text-[15px] font-semibold text-ink mb-1">{hotel.name}</div>
                   <span className={`text-[10px] font-medium px-[9px] py-[3px] rounded-full ${TIER_STYLES[hotel.tier] ?? 'bg-surface2 text-ink2'}`}>
