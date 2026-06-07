@@ -65,10 +65,10 @@ export default function HomeClient() {
           {/* DPTOA card — primary credential */}
           <div className="bg-surface border border-border rounded-md p-[18px] shadow-sm mb-3">
             <div className="flex items-center gap-4">
-              {/* DPTOA logo — replace /dptoa-logo.png with your actual file in /public */}
+              {/* DPTOA logo — loaded from public/dptoa-logo.jpg */}
               <div className="w-[64px] h-[64px] rounded-full overflow-hidden border-2 border-[#E0F0FB] flex-shrink-0 bg-[#EBF6FD]">
                 <img
-                  src="/dptoa-logo.png"
+                  src="/dptoa-logo.jpg"
                   alt="DPTOA Logo"
                   width={64}
                   height={64}
