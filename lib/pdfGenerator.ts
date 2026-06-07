@@ -272,53 +272,29 @@ export async function generateItineraryPDF(result: PlanResult, _lang?: Lang): Pr
     y += dh + 4
   }
 
-  // ─── LOCAL TIPS ──────────────────────────────────────────────
-  const tips = result.destinationName?.toLowerCase().includes('ngwe')
-    ? [
-        'Book bus tickets at least 1 day ahead, especially on weekends.',
-        "Bring cash - ATMs are limited at the beach.",
-        "Negotiate boat prices for Lover's Island - 3,000-5,000 MMK is fair.",
-      ]
-    : [
-        'Book bus tickets at least 1 day ahead, especially on weekends.',
-        'Bring cash - card machines are rare here.',
-        'Best sunsets are from the north end of the beach.',
-      ]
+  // ─── TIPS ─────────────────────────────────────────────────────
+  const tips = [
+    'During peak travel seasons, bus tickets and hotel bookings often become fully booked. Therefore, it is best to make your reservations at least 3 weeks in advance.',
+  ]
 
-  checkBreak(30)
+  checkBreak(34)
   y += 4
-  sectionTitle('LOCAL TIPS', y); y += 5
+  sectionTitle('TIPS', y); y += 5
 
-  const tipsH = tips.length * 7 + 6
+   const tipLines = tips.flatMap((tip) => doc.splitTextToSize(tip, CONTENT - 16))
+  const tipsH = tipLines.length * 5 + 8
   strokeRect(MARGIN, y, CONTENT, tipsH, BORDER, 3)
-  tips.forEach((tip, i) => {
-    const ty = y + 6 + i * 7
-    fc(RED); doc.setLineWidth(0)
-    doc.circle(MARGIN + 5.5, ty - 1, 1, 'F')
+  tipLines.forEach((line, i) => {
+    const ty = y + 7 + i * 5
+    if (i === 0) {
+      fc(RED); doc.setLineWidth(0)
+      doc.circle(MARGIN + 5.5, ty - 1, 1, 'F')
+    }
     doc.setFontSize(8); doc.setFont('helvetica', 'normal'); tc(INK2)
-    txt(tip, MARGIN + 10, ty)
+    txt(line, MARGIN + 10, ty)
   })
   y += tipsH + 6
-
-  // ─── PACKING LIST ─────────────────────────────────────────────
-  checkBreak(28)
-  sectionTitle('WHAT TO PACK', y); y += 5
-
-  const packItems = ['Sunglasses', 'Sunscreen', 'Swimwear', 'Cash (MMK)', 'Power bank', 'Flip flops']
-  const packH = 26
-  strokeRect(MARGIN, y, CONTENT, packH, BORDER, 3)
-
-  const colW = CONTENT / 3
-  packItems.forEach((item, i) => {
-    const col = i % 3
-    const row = Math.floor(i / 3)
-    const px = MARGIN + 4 + col * colW
-    const py = y + 7 + row * 11
-    doc.setFontSize(8); doc.setFont('helvetica', 'normal'); tc(INK2)
-    txt(`- ${item}`, px, py)
-  })
-  y += packH + 6
-
+  
   // ─── VIBER CONTACT ────────────────────────────────────────────
   checkBreak(28)
   filledRect(MARGIN, y, CONTENT, 24, [243, 240, 255] as RGB, 3)
@@ -327,7 +303,7 @@ export async function generateItineraryPDF(result: PlanResult, _lang?: Lang): Pr
   doc.setFontSize(9); doc.setFont('helvetica', 'bold'); tc([61, 45, 142] as RGB)
   txt('Need help booking this trip?', MARGIN + 5, y + 7)
   doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); tc([92, 75, 190] as RGB)
-  txt('Contact Raizen Travel on Viber: +959751067759  |  Response within 1 hour', MARGIN + 5, y + 13)
+  txt('Call: 09682880475  |  Viber: 09751067759  |  Response within 1 hour', MARGIN + 5, y + 13)
   doc.setFontSize(7); tc([115, 96, 242] as RGB)
   txt('raizentravel.com', MARGIN + 5, y + 19)
 
