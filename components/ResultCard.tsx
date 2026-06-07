@@ -23,6 +23,7 @@ const TIER_STYLES: Record<string, string> = {
   boutique:    'bg-[#D1FAE5] text-[#065F46]',
 }
 
+const PHONE_NUMBER = '09682880475'
 const VIBER_NUMBER = '09751067759'
 const VIBER_DEEP_LINK = `viber://chat?number=%2B959751067759`
 
@@ -32,28 +33,14 @@ const DEST_SEASON: Record<string, { season: string; desc: string }> = {
   'chaung-thar': { season: 'Nov — Apr · Dry Season', desc: 'Golden sunsets, warm water, low crowds' },
 }
 
-// Local tips per destination
-const DEST_TIPS: Record<string, string[]> = {
-  ngwesaung: [
-    'Book bus tickets at least 1 day ahead, especially on weekends.',
-    'Bring cash — ATMs are limited at the beach.',
-    "Negotiate boat prices for Lover's Island — 3,000–5,000 MMK is fair.",
+const BOOKING_TIPS = {
+  en: [
+    'During peak travel seasons, bus tickets and hotel bookings often become fully booked. Therefore, it is best to make your reservations at least 3 weeks in advance.',
   ],
-  'chaung-thar': [
-    'Book bus tickets at least 1 day ahead, especially on weekends.',
-    'Bring cash — card machines are rare here.',
-    'Best sunsets are from the north end of the beach — walk 10 mins from town.',
+  mm: [
+    'လူအများလည်ပတ်သည့်ရာသီချိန်ရောက်လျှင် Bus tickets, Hotel Booking များပြည့်တတ်သောကြောင့် အနည်းဆုံး ၃ပတ်ကြို Booking တင်တာအကောင်းဆုံးပါ။',
   ],
 }
-
-const PACKING_LIST = [
-  { emoji: '🕶', label: 'Sunglasses' },
-  { emoji: '🧴', label: 'Sunscreen' },
-  { emoji: '👙', label: 'Swimwear' },
-  { emoji: '💵', label: 'Cash (MMK)' },
-  { emoji: '🔌', label: 'Power bank' },
-  { emoji: '👟', label: 'Flip flops' },
-]
 
 export default function ResultCard({ result, onSave, isSaving }: Props) {
   const { lang, t } = useLang()
@@ -75,7 +62,7 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
     : 'chaung-thar'
 
   const season  = DEST_SEASON[destSlug]
-  const tips    = DEST_TIPS[destSlug] ?? []
+  const tips    = isEn ? BOOKING_TIPS.en : BOOKING_TIPS.mm
   const weather = useWeather(destSlug)
 
   return (
@@ -247,7 +234,7 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
       {tips.length > 0 && (
         <div className="bg-surface border border-border rounded-md px-4 py-[14px]">
           <div className="text-[13px] font-semibold text-ink mb-[10px] flex items-center gap-[6px]">
-            💡 {isEn ? 'Local Tips' : 'ဒေသခံ အကြံပြုချက်'}
+            💡 {isEn ? 'Tips' : 'အကြံပြုချက်'}
           </div>
           <div className="flex flex-col gap-[8px]">
             {tips.map((tip, i) => (
@@ -259,21 +246,6 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
           </div>
         </div>
       )}
-
-      {/* ── Packing list ── */}
-      <div className="bg-surface border border-border rounded-md px-4 py-[14px]">
-        <div className="text-[13px] font-semibold text-ink mb-[10px]">
-          🎒 {isEn ? 'What to Pack' : 'ထည့်သွင်းရန် ပစ္စည်းများ'}
-        </div>
-        <div className="grid grid-cols-2 gap-[8px]">
-          {PACKING_LIST.map((item) => (
-            <div key={item.label} className="flex items-center gap-[8px]">
-              <span className="text-[16px]">{item.emoji}</span>
-              <span className="text-[12px] text-ink2 font-medium">{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* ── Viber Contact Box ── */}
       <div className="bg-[#F3F0FF] border border-[#7360F2]/25 rounded-md overflow-hidden">
@@ -300,19 +272,13 @@ export default function ResultCard({ result, onSave, isSaving }: Props) {
               : 'ပို့ဆောင်ရေး၊ တည်းခိုခန်း နှင့် ခရီးစဉ် စီစဉ်မှုများအတွက် Viber မှ ဆက်သွယ်ပါ။'}
           </p>
 
-          <div className="flex flex-col gap-[6px] mb-[12px]">
-            {[VIBER_NUMBER, '+959751067759'].map((num) => (
-              <a
-                key={num}
-                href={`tel:${num}`}
-                className="flex items-center gap-2 text-[13px] font-semibold text-[#3D2D8E] active:opacity-70"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7360F2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
-                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .86h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.79a16 16 0 006.12 6.12l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
-                </svg>
-                {num}
-              </a>
-            ))}
+         <div className="flex items-center gap-2 mb-[12px] text-[13px] font-semibold text-[#3D2D8E]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7360F2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .86h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.79a16 16 0 006.12 6.12l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+            <a href={`tel:${PHONE_NUMBER}`} className="active:opacity-70">{PHONE_NUMBER}</a>
+            <span className="text-[#7360F2]/50">|</span>
+            <a href={`tel:${VIBER_NUMBER}`} className="active:opacity-70">{VIBER_NUMBER}</a>
           </div>
 
           <a
